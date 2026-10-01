@@ -1,0 +1,121 @@
+# Habitrak MVP: My Day
+
+**Owner:** LA Studios, Marketing and User Usability Director
+**Status:** Draft 1, Oct 1, 2026. Needs Mark's sign-off on the open decisions at the end.
+**Prototype:** [`../prototype/my-day.html`](../prototype/my-day.html), also published as the *Habitrak My Day* artifact.
+
+## 1. Positioning
+
+**One line:** Tap what you do. See your day.
+
+**Promise:** Habitrak shows you where your day actually goes, with one tap per moment and no judgment.
+
+**Who it's for, in launch order:**
+
+1. **The day-tracker.** Wants to see where time goes: work, breaks, coffee, walks, meals, sleep. Not technical. Logs from the home screen or not at all.
+2. **The cutter-backer.** Already counting something (cigarettes, drinks, coffee, vapes) and wants to see it in the context of the whole day. This is Mark, and the 2.0 goal features serve this group.
+3. **Later:** clinicians and programs who receive a summary (paid tier, post-MVP).
+
+**What makes it different:** habits are shown on the same day ribbon as everything else, so the connections show up on their own. Coffee after a short night, a smoke at every work milestone, a second drink when the walk got skipped.
+
+## 2. The primary widget: My Day
+
+The home-screen widget **is** the product. The app exists to set it up and to look back.
+
+### Two kinds of things you track
+
+| Kind | One tap does | Examples | Shown as |
+|---|---|---|---|
+| **Moment** | Logs one, right now | Coffee, Water, Smoke, Drink, Meal, Snack, Meds | A tick on the day ribbon and a count on the tile |
+| **Stretch** | Starts it; tap again to stop. Starting another stops the current one | Work, Walk, Commute, Rest, Screen time, Sleep | A colored band on the day ribbon; "Now: Work · 1h 12m" |
+
+Only one stretch runs at a time. That keeps the model simple enough to explain in one sentence: *"Tap a moment when it happens. Tap a stretch to start it, tap again to stop."*
+
+### Widget sizes (Android, Jetpack Glance)
+
+| Size | Content | Purpose |
+|---|---|---|
+| **4×2 (default)** | Now line, 24-hour day ribbon, 4 tiles with today's counts | The primary widget |
+| 2×2 | Now line, 4 tiles, no ribbon | Smaller home screens |
+| 1×1 | One tile (user picks). Tap to log | Single habit people want to count fast |
+| Quick Settings tile | Start/stop the current stretch or log the user's top moment | Logging from the pull-down shade |
+| Ongoing notification | While a stretch runs: "Work · 42m" with **Stop** | Required by Android for visible running state; also a second log surface |
+
+### Widget rules
+
+- Every tap gives feedback in the widget within 300 ms (count increments, tile pulses), and the app is never opened by a tile tap.
+- Undo: tapping the same moment tile within 5 seconds offers **Undo** in the widget's Now line instead of a second log. Opening the app shows the full Undo bar.
+- The day ribbon runs from the user's wake time, not midnight, so late nights stay on "today".
+- No numbers that need explaining in the widget. Counts only.
+
+## 3. App screens (MVP)
+
+| Screen | Job | Content |
+|---|---|---|
+| **Today** | Log and look at today | Now card with Stop, day ribbon, all tiles, timeline newest first with Edit and Undo |
+| **Week** | See patterns | 7 day ribbons stacked, totals per tracker, one plain-language observation |
+| **Goals** | Opt-in limits for any moment | Ceiling per day and minimum wait between (the 2.0 "gap"), framed as a ceiling, never a budget |
+| **Me** | Settings | Trackers, wake time, theme, export, delete account and data |
+
+Onboarding is two screens: **pick what to track** (presets, up to 8, change anytime) and **add the widget** (Android pin-widget prompt).
+
+## 4. Scope
+
+### In the MVP (Android first)
+
+- Moments and stretches, user-chosen from presets, renameable, with color
+- 4×2 widget, 1×1 widget, Quick Settings tile, ongoing notification
+- Today, Week, Goals (ceiling and wait time), Me
+- Edit time on any entry; late logging with a time window (from 2.0)
+- Works fully offline; account optional at first launch, needed only for sync and backup
+- Light and dark themes, 48dp targets, TalkBack labels on every tile
+- Export to CSV; delete all data in-app (store requirement)
+
+### Carried from 2.0, after MVP (v1.1+)
+
+| Feature | Release |
+|---|---|
+| Why chips and notes on a moment ("Why this one?") | v1.1, opt-in per tracker |
+| Supplies: packs, bottles, cartons, stock on hand | v1.1 |
+| Drink detail: pour, mixer, glass, standard drinks, calories | v1.2 |
+| Morning check-in and sleep table | v1.1 |
+| Doctor summary (paid) | v1.2 |
+| Drive check, wearables, gesture detection | After launch, native |
+
+### Not in the MVP
+
+Brand names, prices, spend math, streaks, social features, ads, AI insights.
+
+## 5. Language rules (from the 2.0 principles, made enforceable)
+
+- Tile labels are nouns the user chose: "Coffee", not "Log caffeine intake".
+- One sentence per explanation, never wrapping on a 360dp screen.
+- No "quit", "fail", "relapse", "streak broken". Goals say "ceiling" and "wait".
+- Every toast names what happened: "Coffee logged · 2:47 PM". Always with Undo.
+
+## 6. Architecture decision needed (Android)
+
+The Commercialization Plan uses a **Trusted Web Activity** for Android. A TWA can't host a home-screen widget, a Quick Settings tile, or an ongoing notification. Options:
+
+| Option | Widget | Effort | Recommendation |
+|---|---|---|---|
+| **A. Capacitor (Android + iOS)**, web UI plus a small native Kotlin/Glance widget module sharing a local SQLite store | Yes | Medium. One web codebase; ~1 native module per platform | **Recommended.** Same shell on both stores; iOS widget for Guideline 4.2 comes from the same pattern |
+| B. TWA plus a separate native widget app | Awkward: two processes, two stores of data | Medium-high | No |
+| C. Full native (Kotlin/Compose, then Swift) | Yes, best feel | High; two codebases | Only if A fails review or performance |
+
+Data path under A: widget taps write to on-device SQLite first (works offline, instant), and the app syncs to Supabase with row-level security when signed in.
+
+## 7. Acceptance criteria for "MVP design done"
+
+1. A first-time user who has never seen the app logs their first moment from the widget within 60 seconds of install, in 5 of 5 hallway tests.
+2. The same users can explain moment vs. stretch in their own words after 1 day.
+3. No screen in the MVP needs scrolling to reach its primary action on a 360×640dp phone.
+4. Every 2.0 feature is either in the MVP, scheduled in section 4, or explicitly cut.
+5. Store listing draft, icon, and 5 screenshots approved.
+
+## 8. Open decisions for Mark
+
+1. **Android shell:** approve Capacitor (option A) instead of TWA.
+2. **Name lock:** Habitrak, after a Play Store and domain search.
+3. **Smoke and Drink presets visible at onboarding?** Recommendation: yes, in the list, not pre-selected.
+4. **Account at first launch?** Recommendation: no; offer it after day 3 for backup.
