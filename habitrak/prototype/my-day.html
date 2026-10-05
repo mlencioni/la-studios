@@ -285,7 +285,7 @@ function seedWeek(){
   }
   return out;
 }
-const DEF={sel:["work","coffee","walk","water","meal","smoke","rest","sleep"],goals:{smoke:{cap:6,wait:60},coffee:{cap:4,wait:0}}};
+const DEF={sel:["work","coffee","walk","water","meal","smoke","rest","sleep","commute"],goals:{smoke:{cap:6,wait:60},coffee:{cap:4,wait:0}}};
 const FIRST_RUN=["coffee","work","water","walk","meal"]; /* fresh install: Smoke and Drink offered, not pre-picked */
 let S={}; const week=seedWeek();
 function fresh(){const t=seedToday(); S={sel:DEF.sel.slice(),goals:JSON.parse(JSON.stringify(DEF.goals)),entries:t.entries,next:t.next,view:"home",tab:"today",step:1};}
@@ -453,13 +453,13 @@ function renderGoals(){
 function pickerHTML(){
   const grp=(k,title,sub)=>'<p class="lbl2">'+title+'</p><p style="margin:-4px 0 10px">'+sub+'</p><div class="chips">'+Object.keys(CAT).filter(t=>CAT[t].k===k).map(t=>{const i=S.sel.indexOf(t);
     return '<button type="button" class="chip" data-pick="'+t+'" aria-pressed="'+(i>=0)+'" style="--c:'+col(t)+'">'+svg(t)+esc(CAT[t].n)+(i>=0&&i<4?'<span class="n" aria-label="widget slot '+(i+1)+'">'+(i+1)+'</span>':'')+'</button>';}).join("")+'</div>';
-  return '<h3>What do you want to keep track of?</h3><p>Pick up to 8. Your first 4 picks go on your widget, in the order shown by the numbers. Change anytime.</p>'+
+  return '<h3>What do you want to keep track of?</h3><p>Pick up to 9. Your first 4 picks go on your widget, in the order shown by the numbers. Change anytime.</p>'+
     grp("m","Moments","Tap when it happens.")+grp("s","Stretches","Tap to start, tap again to stop.")+
     '';
 }
 function bindPicker(root){
   root.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>{ const t=b.dataset.pick, i=S.sel.indexOf(t);
-    if(i>=0){ if(S.sel.length>1) S.sel.splice(i,1); } else if(S.sel.length<8) S.sel.push(t); else toast("8 is the most. Remove one first.",null);
+    if(i>=0){ if(S.sel.length>1) S.sel.splice(i,1); } else if(S.sel.length<9) S.sel.push(t); else toast("9 is the most. Remove one first.",null);
     save(); render(); }));
 }
 function renderTrackers(){ $("a-title").textContent="Trackers"; $("a-sub").textContent="What shows on your widget and Today"; $("a-body").innerHTML=pickerHTML(); bindPicker($("a-body")); }
@@ -470,7 +470,7 @@ function renderSetup(){
     $("s-next").textContent="Add widget"; setupCue(); }
 }
 function setupCue(){ const b=$("s-body"), more=S.step===1 && b.scrollTop+b.clientHeight<b.scrollHeight-8;
-  $("s-count").textContent=S.step===1? S.sel.length+" of 8 picked"+(more?" · more below":"") : ""; }
+  $("s-count").textContent=S.step===1? S.sel.length+" of 9 picked"+(more?" · more below":"") : ""; }
 $("s-body").addEventListener("scroll",setupCue);
 $("s-next").addEventListener("click",()=>{ if(S.step===1){S.step=2; render();} else { S.step=1; setView("home"); toast("My Day added to your home screen",null);} });
 
@@ -484,7 +484,7 @@ const NOTES={
     "<b>Android build adds</b> a Quick Settings tile and an ongoing notification with Stop while a stretch runs. That's why Habitrak ships in Capacitor, not a Trusted Web Activity."],
     tryit:"Try it: tap Coffee, then Walk. Work stops and Walk starts. Undo appears in the widget for 5 seconds."},
   today:{h:"Today: the full picture, still one tap",items:[
-    "<b>Same tiles as the widget</b>, plus the rest of your picks, so nothing new to learn.",
+    "<b>Same tiles as the widget</b>, plus the rest of your picks: up to 9, in a 3×3 grid, so the whole day fits on one screen.",
     "<b>Timeline newest first</b> with Edit on every row. One way to fix anything, instead of 11 separate \"▸\" questions in 2.0.",
     "<b>Moments are dots, stretches are bands.</b> The day's shape is visible before reading a word.",
     "<b>Every action names itself</b> in the toast (\"Coffee logged · 2:49 PM\") and offers Undo."],

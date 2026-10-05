@@ -2,6 +2,10 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 5, 2026: Tracker limit raised to 9
+
+- **Changed (Mark's call):** up to 9 trackers instead of 8, so Today's tile grid is a full 3×3 with no gap. The widget still shows the first 4.
+
 ## Oct 5, 2026: Private test step 1, design walkthrough
 
 - **Found:** 2 blockers, 5 major, 3 minor ([findings](06-walkthrough-findings.md)). Biggest: a fresh install showed someone else's day with Work already running, and there was no way to delete a mistaken entry after Undo expired.

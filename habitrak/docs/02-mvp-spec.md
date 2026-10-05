@@ -52,18 +52,18 @@ Only one stretch runs at a time. That keeps the model simple enough to explain i
 
 | Screen | Job | Content |
 |---|---|---|
-| **Today** | Log and look at today | Now card with Stop, day ribbon, all tiles, timeline newest first with Edit and Undo |
+| **Today** | Log and look at today | Now card with Stop, day ribbon, all tiles in a 3×3 grid (up to 9 trackers), timeline newest first with Edit and Undo |
 | **Week** | See patterns | 7 day ribbons stacked, totals per tracker, one plain-language observation |
 | **Goals** | Opt-in limits for any moment | Ceiling per day and minimum wait between (the 2.0 "gap"), framed as a ceiling, never a budget |
 | **Me** | Settings | Trackers, wake time, theme, export, delete account and data |
 
-Onboarding is two screens: **pick what to track** (presets, up to 8, change anytime) and **add the widget** (Android pin-widget prompt).
+Onboarding is two screens: **pick what to track** (presets, up to 9, change anytime) and **add the widget** (Android pin-widget prompt).
 
 ## 4. Scope
 
 ### In the MVP (Android first)
 
-- Moments and stretches, user-chosen from presets, renameable, with color
+- Moments and stretches, user-chosen from presets, renameable, with color; up to 9 trackers so Today shows a full 3×3 grid
 - 4×2 widget, 1×1 widget, Quick Settings tile, ongoing notification
 - Today, Week, Goals (ceiling and wait time), Me
 - Edit time on any entry; late logging with a time window (from 2.0)
@@ -125,3 +125,4 @@ Full native (Kotlin/Compose, then Swift) stays the fallback if Capacitor fails s
 | 5 | Repo workflow: commit straight to the branch until MVP; pull requests start after MVP |
 | 6 | Web home for MVP: **habitrak.lencioni.io** (privacy policy, account deletion, support). A dedicated domain can come later |
 | 7 | Nobody outside L&A sees Habitrak before MVP. Testing runs in three private steps ([test plan](05-private-test-plan.md)): design walkthrough, Mark's own use on an **older Samsung Galaxy**, then the Google Play closed test at MVP. Mark decides when step 2 starts. The phone checks backward compatibility to check backward compatibility. The oldest supported Android version is set from that phone before the build starts |
+| 8 | Up to **9 trackers** (was 8), so Today shows a complete 3×3 grid. The widget still shows the first 4 (3 at large text) |
