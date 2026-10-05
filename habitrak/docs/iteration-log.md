@@ -2,13 +2,21 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 5, 2026: Private test step 1, design walkthrough
+
+- **Found:** 2 blockers, 5 major, 3 minor ([findings](06-walkthrough-findings.md)). Biggest: a fresh install showed someone else's day with Work already running, and there was no way to delete a mistaken entry after Undo expired.
+- **Fixed in prototype v4:** all blockers and majors. On a phone, the prototype now fills the screen, ready for step 2.
+- **Carried into the build:** edit a stretch's end time, Week empty state, drag to reorder widget tiles.
+- **Next:** step 2 (Mark's own use on the old Galaxy) when Mark decides.
+
 ## Oct 5, 2026: Decisions approved
 
 - **Approved by Mark:** Capacitor on Android (TWA dropped); name locked as Habitrak; Smoke and Drink offered at sign-up, not pre-selected; no account at first launch, backup offered after day 3.
 - **Updated:** MVP spec (sections 6 and 8), Android release path, prototype notes, and the Commercialization Plan doc (renamed to Habitrak, stack table, Oct 5 decisions, phase 2, Road to publish).
 - **Workflow:** commits go straight to the branch until MVP; no pull requests yet.
 - **Also decided:** hallway tests come before any build, on an older Samsung Galaxy to check backward compatibility; web home is habitrak.lencioni.io; Play Console isn't set up yet, so the D-U-N-S request starts now.
-- **Next:** run the 5 hallway tests with the [test kit](05-hallway-test-kit.md).
+- **Changed same day:** hallway tests dropped, because Mark wants nobody to see Habitrak before MVP. Replaced by the three-step [private test plan](05-private-test-plan.md): design walkthrough now, Mark's own use when he decides, and the Play closed test at MVP.
+- **Next:** step 1, the design walkthrough.
 
 ## Oct 1, 2026: My Day direction set
 

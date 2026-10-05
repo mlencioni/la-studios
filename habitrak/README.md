@@ -14,11 +14,14 @@ The first L&A Studios product. This folder tracks Habitrak from the 2.0 prototyp
 2. [MVP spec: My Day](docs/02-mvp-spec.md)
 3. [Android release path](docs/03-android-release-path.md)
 4. [Play Store listing draft](docs/04-store-listing-draft.md)
-5. [Hallway test kit](docs/05-hallway-test-kit.md)
-6. [Iteration log](docs/iteration-log.md)
+5. [Private test plan](docs/05-private-test-plan.md)
+6. [Walkthrough findings](docs/06-walkthrough-findings.md)
+7. [Iteration log](docs/iteration-log.md)
 
 ## Status
 
-**Stage 0, design lock.** Decisions approved Oct 5, 2026 (spec section 8). Next: hallway tests on a Samsung Galaxy ([test kit](docs/05-hallway-test-kit.md)), Play Store name search, and start the D-U-N-S request.
+**Stage 0, design lock.** Decisions approved Oct 5, 2026 (spec section 8). Step 1 of the [private test plan](docs/05-private-test-plan.md) is done. Next: step 2 when Mark decides, Play Store name search, and start the D-U-N-S request.
+
+**Confidentiality:** nobody outside L&A sees Habitrak until the MVP closed test on Google Play.
 
 **Workflow:** commit straight to the working branch until MVP. Pull requests start after MVP.

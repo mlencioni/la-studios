@@ -10,7 +10,8 @@ Rules and fees change. Each item marked **verify** must be checked against curre
 - [x] Mark approves the open decisions in spec section 8 (Oct 5, 2026)
 - [ ] Play Store name search for Habitrak
 - [x] Web home decided: habitrak.lencioni.io (Oct 5, 2026)
-- [ ] 5 hallway tests on Mark's Samsung Galaxy using the [test kit](05-hallway-test-kit.md); log results in the [iteration log](iteration-log.md)
+- [x] Private test step 1: design walkthrough of the prototype, Oct 5, 2026 ([findings](06-walkthrough-findings.md))
+- [ ] Private test step 2: Mark uses the prototype on the old Galaxy (start date: Mark's call)
 - [ ] Icon, wordmark, 5 screenshots
 
 ## Stage 1. Build
@@ -39,7 +40,7 @@ Rules and fees change. Each item marked **verify** must be checked against curre
 ## Stage 3. Test and launch
 
 - [ ] Internal test: Mark + 2
-- [ ] Closed test: 10 to 20 testers, at least 2 weeks
+- [ ] Closed test: 10 to 20 invited testers, at least 2 weeks. This is private test step 3 and the first time anyone outside L&A sees Habitrak; testers get the 6-task survey from the [test plan](05-private-test-plan.md)
 - [ ] Store listing from [04](04-store-listing-draft.md)
 - [ ] Production rollout at 20%, then 100%
 

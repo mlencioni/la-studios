@@ -108,8 +108,8 @@ Full native (Kotlin/Compose, then Swift) stays the fallback if Capacitor fails s
 
 ## 7. Acceptance criteria for "MVP design done"
 
-1. A first-time user who has never seen the app logs their first moment from the widget within 60 seconds of install, in 5 of 5 hallway tests.
-2. The same users can explain moment vs. stretch in their own words after 1 day.
+1. In the design walkthrough, every first-run task can be finished without help; at the MVP closed test, testers log their first moment from the widget within 60 seconds of install.
+2. Closed-test testers can explain moment vs. stretch in their own words after 1 day (survey question).
 3. No screen in the MVP needs scrolling to reach its primary action on a 360×640dp phone.
 4. Every 2.0 feature is either in the MVP, scheduled in section 4, or explicitly cut.
 5. Store listing draft, icon, and 5 screenshots approved.
@@ -124,4 +124,4 @@ Full native (Kotlin/Compose, then Swift) stays the fallback if Capacitor fails s
 | 4 | **No account at first launch.** Logs stay on the phone; backup is offered after day 3 |
 | 5 | Repo workflow: commit straight to the branch until MVP; pull requests start after MVP |
 | 6 | Web home for MVP: **habitrak.lencioni.io** (privacy policy, account deletion, support). A dedicated domain can come later |
-| 7 | Next step: **hallway tests before building**, on an **older Samsung Galaxy** to check backward compatibility. The oldest supported Android version is set from that phone before the build starts |
+| 7 | Nobody outside L&A sees Habitrak before MVP. Testing runs in three private steps ([test plan](05-private-test-plan.md)): design walkthrough, Mark's own use on an **older Samsung Galaxy**, then the Google Play closed test at MVP. Mark decides when step 2 starts. The phone checks backward compatibility to check backward compatibility. The oldest supported Android version is set from that phone before the build starts |

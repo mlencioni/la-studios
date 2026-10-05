@@ -47,7 +47,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 /* ---------- phone ---------- */
 .phone{width:360px;max-width:100%;margin:0 auto;background:var(--bezel);border-radius:44px;padding:10px;box-shadow:0 18px 50px #0000002e}
 .screen{position:relative;height:740px;border-radius:34px;overflow:hidden;background:var(--paper);display:flex;flex-direction:column}
-@media (max-width:420px){.phone{padding:6px;border-radius:36px}.screen{height:700px;border-radius:30px}}
+@media (max-width:480px){.phone{width:calc(100% + 32px);max-width:none;margin-inline:-16px;padding:0;border-radius:0;background:transparent;box-shadow:none}.screen{height:680px;border-radius:0}}
 .sbar{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 4px;font-size:.82rem;font-weight:500;flex:none}
 .sbar svg{width:44px;height:12px}
 .view{flex:1;min-height:0;display:flex;flex-direction:column}
@@ -64,14 +64,15 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .wnow .dot{width:10px;height:10px;border-radius:50%;flex:none}
 .wnow b{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .wnow .when{color:var(--muted);margin-left:auto;font-size:.8rem;flex:none}
-.wnow button{border:0;background:transparent;color:var(--brand);font-weight:700;text-decoration:underline;padding:0 4px;min-height:32px;cursor:pointer}
+.wnow button{border:0;background:var(--brand-soft);color:var(--ink);font-weight:700;border-radius:999px;padding:0 14px;min-height:40px;min-width:64px;cursor:pointer}
+.wnow{min-height:40px}
 .ribbon{display:block;width:100%;height:auto}
 .wtiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .tile{position:relative;border:0;border-radius:18px;background:var(--tile);min-height:68px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--ink);overflow:hidden;transition:transform .12s}
 .tile:active{transform:scale(.96)}
 .tile svg{width:22px;height:22px;stroke:var(--c);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tile .lbl{font-size:.74rem;font-weight:500;line-height:1.1;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.tile .val{font-size:.8rem;font-weight:700;line-height:1.1;color:var(--muted)}
+.tile .val{font-size:.8rem;font-weight:700;line-height:1.1;color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .tile.on{background:var(--c);color:var(--paper)}
 .tile.on svg{stroke:var(--paper)}
 .tile.on .val{color:var(--paper)}
@@ -111,6 +112,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .tl .d{width:10px;height:10px;border-radius:50%;flex:none}
 .tl .w{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl button{border:0;background:transparent;color:var(--brand);font-weight:500;min-height:36px;padding:0 6px;cursor:pointer}
+.tl li.editing{flex-wrap:wrap}
 .tl input{border:1px solid var(--line);border-radius:8px;background:var(--paper);min-height:36px;padding:0 6px}
 .navbar{flex:none;display:grid;grid-template-columns:repeat(4,1fr);background:var(--tile);padding:8px 6px 14px}
 .navbar button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.74rem;font-weight:500;color:var(--muted);cursor:pointer;min-height:52px}
@@ -212,7 +214,7 @@ table.tot tr:last-child td{border-bottom:0}
         <!-- First run -->
         <div class="view setup" id="v-setup" hidden>
           <div class="scroll" id="s-body"></div>
-          <div class="foot"><div class="prog" id="s-prog"><i class="on"></i><i></i></div><button type="button" class="pill" id="s-next">Next</button></div>
+          <div class="foot"><div><div class="prog" id="s-prog"><i class="on"></i><i></i></div><p id="s-count" style="margin:6px 0 0;font-size:.82rem"></p></div><button type="button" class="pill" id="s-next">Next</button></div>
         </div>
 
         <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
@@ -284,7 +286,7 @@ function seedWeek(){
   return out;
 }
 const DEF={sel:["work","coffee","walk","water","meal","smoke","rest","sleep"],goals:{smoke:{cap:6,wait:60},coffee:{cap:4,wait:0}}};
-const FIRST_RUN=["work","coffee","walk","water","meal"]; /* fresh install: Smoke and Drink offered, not pre-picked */
+const FIRST_RUN=["coffee","work","water","walk","meal"]; /* fresh install: Smoke and Drink offered, not pre-picked */
 let S={}; const week=seedWeek();
 function fresh(){const t=seedToday(); S={sel:DEF.sel.slice(),goals:JSON.parse(JSON.stringify(DEF.goals)),entries:t.entries,next:t.next,view:"home",tab:"today",step:1};}
 function save(){try{localStorage.setItem("habitrak-myday-v1",JSON.stringify({sel:S.sel,goals:S.goals,view:S.view,tab:S.tab}));}catch(_){}}
@@ -323,10 +325,10 @@ function ribbon(entries,start,opts){
 const hourLbls='<div class="hours" aria-hidden="true"><span>6a</span><span>12p</span><span>6p</span><span>12a</span><span>6a</span></div>';
 
 /* ---- tiles ---- */
-function tileHTML(tr,extraCls){
+function tileHTML(tr,extraCls,compact){
   const c=CAT[tr], r=running(), on=c.k==="s"&&r&&r.tr===tr; let val;
-  if(c.k==="m"){ const n=countToday(tr), g=S.goals[tr]; val=(g&&g.cap)? n+" of "+g.cap : String(n);
-    if(g&&g.wait){ const l=lastOf(tr); if(l){ const left=g.wait*MIN-(now()-l.t); if(left>0) val+=" · wait "+dur(left);} } }
+  if(c.k==="m"){ const n=countToday(tr), g=S.goals[tr]; val=(g&&g.cap&&!compact)? n+" of "+g.cap : String(n);
+    if(g&&g.wait&&!compact){ const l=lastOf(tr); if(l){ const left=g.wait*MIN-(now()-l.t); if(left>0) val+=" · wait "+dur(left);} } }
   else val= on? dur(now()-r.t) : "Start";
   const aria=c.k==="m"? "Log "+c.n+", "+countToday(tr)+" today" : (on? "Stop "+c.n : "Start "+c.n);
   return '<button type="button" class="tile'+(on?" on":"")+(extraCls?" "+extraCls:"")+'" data-tr="'+tr+'" style="--c:'+col(tr)+'" aria-label="'+esc(aria)+'">'+svg(tr)+'<span class="lbl">'+esc(c.n)+'</span><span class="val">'+esc(val)+'</span></button>';
@@ -371,9 +373,10 @@ function renderHome(){
   if(widgetMsg) line='<span class="dot" style="background:var(--brand)"></span><b>'+esc(widgetMsg.text)+'</b>';
   else if(r) line='<span class="dot" style="background:'+col(r.tr)+'"></span><span>Now</span><b>'+esc(CAT[r.tr].n)+'</b><span>· '+dur(n-r.t)+'</span>';
   else line='<span class="dot" style="background:var(--line)"></span><span>Nothing running</span>';
-  line+='<span class="when">'+(widgetMsg?'<button type="button" id="w-undo">Undo</button>':'since wake 6:50')+'</span>';
-  const tiles=S.sel.slice(0,4).map(t=>tileHTML(t)).join("");
-  $("w42").innerHTML='<div class="wnow">'+line+'</div>'+ribbon(today(),dayStart,{now:true,h:22,label:"Today so far"})+'<div class="wtiles">'+tiles+'</div>';
+  line+='<span class="when">'+(widgetMsg&&undoFn?'<button type="button" id="w-undo">Undo</button>':(!widgetMsg&&r?'<button type="button" data-stop aria-label="Stop '+esc(CAT[r.tr].n)+'">Stop</button>':''))+'</span>';
+  const big=parseFloat(getComputedStyle(document.documentElement).fontSize)>17, nT=big?3:4;
+  const tiles=S.sel.slice(0,nT).map(t=>tileHTML(t,'',true)).join("");
+  $("w42").innerHTML='<div class="wnow">'+line+'</div>'+ribbon(today(),dayStart,{now:true,h:22,label:"Today so far"})+'<div class="wtiles" style="grid-template-columns:repeat('+nT+',minmax(0,1fr))">'+tiles+'</div>';
   const wu=$("w-undo"); if(wu) wu.addEventListener("click",()=>$("toast-undo").click());
   const one=S.sel.find(t=>CAT[t].k==="m"&&S.sel.indexOf(t)>=4) || S.sel.find(t=>CAT[t].k==="m") || S.sel[0];
   $("w11").innerHTML=tileHTML(one);
@@ -398,11 +401,15 @@ function renderToday(){
   h+='<p class="lbl2">Timeline</p><ul class="tl">'+list.map(e=>{
     const c=CAT[e.tr], what=c.k==="s"? c.n+" · "+(e.end==null? "now, "+dur(n-e.t) : dur(e.end-e.t)) : c.n;
     const t=c.k==="s"? fmtShort(e.t)+"–"+(e.end==null?"now":fmtShort(e.end)) : fmt(e.t);
-    if(editing===e.id) return '<li><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(c.n)+'</span><input type="time" id="edit-t" aria-label="New start time for '+esc(c.n)+'" value="'+new Date(e.t).toTimeString().slice(0,5)+'"><button type="button" data-save="'+e.id+'">Save</button></li>';
+    if(editing===e.id) return '<li class="editing"><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(c.n)+'</span><input type="time" id="edit-t" aria-label="New start time for '+esc(c.n)+'" value="'+new Date(e.t).toTimeString().slice(0,5)+'"><button type="button" data-save="'+e.id+'">Save</button><button type="button" data-del="'+e.id+'">Delete</button></li>';
     return '<li><span class="t">'+t+'</span><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(what)+'</span><button type="button" data-edit="'+e.id+'" aria-label="Edit '+esc(c.n)+' at '+fmt(e.t)+'">Edit</button></li>';
   }).join("")+'</ul>';
   $("a-body").innerHTML=h;
   $("a-body").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>{editing=+b.dataset.edit; render(); const i=$("edit-t"); if(i) i.focus();}));
+  $("a-body").querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>{
+    const e=S.entries.find(x=>x.id===+b.dataset.del); if(!e) return; const was=e.end;
+    S.entries=S.entries.filter(x=>x!==e); editing=null;
+    toast(CAT[e.tr].n+" deleted",()=>{ e.end=was; S.entries.push(e); }); save(); render(); }));
   $("a-body").querySelectorAll("[data-save]").forEach(b=>b.addEventListener("click",()=>{
     const e=S.entries.find(x=>x.id===+b.dataset.save), v=$("edit-t").value;
     if(e&&v){ const [hh,mm]=v.split(":").map(Number), d=new Date(e.t); d.setHours(hh,mm,0,0); const t=d.getTime();
@@ -433,7 +440,7 @@ function renderGoals(){
   let h='<div class="obs">A ceiling is a line to stay under, not an amount to use up.</div><div class="card">';
   for(const m of S.sel.filter(t=>CAT[t].k==="m")){ const g=S.goals[m]||{cap:0,wait:0};
     h+='<div class="goal" style="--c:'+col(m)+'"><span class="gi">'+svg(m)+'</span><b>'+esc(CAT[m].n)+'</b><div class="rows">'+
-      '<div class="step"><span>Ceiling a day<b>'+(g.cap||"Off")+'</b></span><span style="padding:0;display:flex"><button type="button" data-g="'+m+'" data-f="cap" data-d="-1" aria-label="Lower '+esc(CAT[m].n)+' ceiling">−</button><button type="button" data-g="'+m+'" data-f="cap" data-d="1" aria-label="Raise '+esc(CAT[m].n)+' ceiling">+</button></span></div>'+
+      '<div class="step"><span>Most a day<b>'+(g.cap||"Off")+'</b></span><span style="padding:0;display:flex"><button type="button" data-g="'+m+'" data-f="cap" data-d="-1" aria-label="Lower '+esc(CAT[m].n)+' ceiling">−</button><button type="button" data-g="'+m+'" data-f="cap" data-d="1" aria-label="Raise '+esc(CAT[m].n)+' ceiling">+</button></span></div>'+
       '<div class="step"><span>Wait between<b>'+(g.wait?dur(g.wait*MIN):"Off")+'</b></span><span style="padding:0;display:flex"><button type="button" data-g="'+m+'" data-f="wait" data-d="-15" aria-label="Shorter wait for '+esc(CAT[m].n)+'">−</button><button type="button" data-g="'+m+'" data-f="wait" data-d="15" aria-label="Longer wait for '+esc(CAT[m].n)+'">+</button></span></div>'+
       '</div></div>'; }
   h+='</div>';
@@ -446,9 +453,9 @@ function renderGoals(){
 function pickerHTML(){
   const grp=(k,title,sub)=>'<p class="lbl2">'+title+'</p><p style="margin:-4px 0 10px">'+sub+'</p><div class="chips">'+Object.keys(CAT).filter(t=>CAT[t].k===k).map(t=>{const i=S.sel.indexOf(t);
     return '<button type="button" class="chip" data-pick="'+t+'" aria-pressed="'+(i>=0)+'" style="--c:'+col(t)+'">'+svg(t)+esc(CAT[t].n)+(i>=0&&i<4?'<span class="n" aria-label="widget slot '+(i+1)+'">'+(i+1)+'</span>':'')+'</button>';}).join("")+'</div>';
-  return '<h3>What do you want to keep track of?</h3><p>Pick up to 8. The first 4 go on your widget. Change anytime.</p>'+
+  return '<h3>What do you want to keep track of?</h3><p>Pick up to 8. Your first 4 picks go on your widget, in the order shown by the numbers. Change anytime.</p>'+
     grp("m","Moments","Tap when it happens.")+grp("s","Stretches","Tap to start, tap again to stop.")+
-    '<p style="margin:0">'+S.sel.length+' of 8 picked</p>';
+    '';
 }
 function bindPicker(root){
   root.querySelectorAll("[data-pick]").forEach(b=>b.addEventListener("click",()=>{ const t=b.dataset.pick, i=S.sel.indexOf(t);
@@ -458,10 +465,13 @@ function bindPicker(root){
 function renderTrackers(){ $("a-title").textContent="Trackers"; $("a-sub").textContent="What shows on your widget and Today"; $("a-body").innerHTML=pickerHTML(); bindPicker($("a-body")); }
 function renderSetup(){
   const p=$("s-prog").children; p[0].classList.add("on"); p[1].classList.toggle("on",S.step===2);
-  if(S.step===1){ $("s-body").innerHTML=pickerHTML(); bindPicker($("s-body")); $("s-next").textContent="Next"; }
+  if(S.step===1){ $("s-body").innerHTML=pickerHTML(); bindPicker($("s-body")); $("s-next").textContent="Next"; setupCue(); }
   else { $("s-body").innerHTML='<h3>Put My Day on your home screen</h3><p>Log in one tap without opening the app. This is where most of your logging will happen.</p><div class="widget" style="background:var(--tile)"><div class="wnow"><span class="dot" style="background:var(--line)"></span><span>Nothing running</span></div>'+ribbon([],dayStart,{h:22})+'<div class="wtiles">'+S.sel.slice(0,4).map(t=>tileHTML(t)).join("")+'</div></div><p style="margin-top:12px">You can also add a 1×1 tile for the one thing you log most.</p>';
-    $("s-next").textContent="Add widget"; }
+    $("s-next").textContent="Add widget"; setupCue(); }
 }
+function setupCue(){ const b=$("s-body"), more=S.step===1 && b.scrollTop+b.clientHeight<b.scrollHeight-8;
+  $("s-count").textContent=S.step===1? S.sel.length+" of 8 picked"+(more?" · more below":"") : ""; }
+$("s-body").addEventListener("scroll",setupCue);
 $("s-next").addEventListener("click",()=>{ if(S.step===1){S.step=2; render();} else { S.step=1; setView("home"); toast("My Day added to your home screen",null);} });
 
 /* ---- notes ---- */
@@ -474,7 +484,7 @@ const NOTES={
     "<b>Android build adds</b> a Quick Settings tile and an ongoing notification with Stop while a stretch runs. That's why Habitrak ships in Capacitor, not a Trusted Web Activity."],
     tryit:"Try it: tap Coffee, then Walk. Work stops and Walk starts. Undo appears in the widget for 5 seconds."},
   today:{h:"Today: the full picture, still one tap",items:[
-    "<b>Same tiles as the widget</b>, all 8, so nothing new to learn.",
+    "<b>Same tiles as the widget</b>, plus the rest of your picks, so nothing new to learn.",
     "<b>Timeline newest first</b> with Edit on every row. One way to fix anything, instead of 11 separate \"▸\" questions in 2.0.",
     "<b>Moments are dots, stretches are bands.</b> The day's shape is visible before reading a word.",
     "<b>Every action names itself</b> in the toast (\"Coffee logged · 2:49 PM\") and offers Undo."],
@@ -494,7 +504,7 @@ const NOTES={
     "<b>Screen 1: pick what to track.</b> Smoke and Drink are listed but not pre-picked, so the app reads as a day tracker first.",
     "<b>Screen 2: add the widget.</b> On Android this triggers the pin-widget prompt.",
     "<b>No account at first launch.</b> Logs stay on the phone from the first tap; backup is offered after day 3.",
-    "<b>Target:</b> first log within 60 seconds of install, in 5 of 5 hallway tests."]}
+    "<b>Target:</b> first log within 60 seconds of install, checked first in a private design walkthrough, then in the MVP closed test."]}
 };
 function renderNotes(){
   const key=S.view==="app"? S.tab : S.view, n=NOTES[key];
@@ -502,13 +512,13 @@ function renderNotes(){
   if(n.kinds) h+='<div class="kinds"><div><b>Moment</b>Tap when it happens. Coffee, Water, Smoke.</div><div><b>Stretch</b>Tap to start, tap again to stop. Work, Walk, Sleep.</div></div>';
   h+='<ol>'+n.items.map(i=>'<li>'+i+'</li>').join("")+'</ol>';
   if(n.tryit) h+='<p class="try">'+n.tryit+'</p>';
-  h+='<div class="meta"><span>Draft 2 · Oct 5, 2026 · LA Studios Marketing and Usability</span><button type="button" id="reset">Reset sample day</button></div>';
+  h+='<div class="meta"><span>Draft 3 · Oct 5, 2026 · LA Studios Marketing and Usability</span><button type="button" id="reset">Reset sample day</button></div>';
   $("notes").innerHTML=h;
   $("reset").addEventListener("click",()=>{ try{localStorage.removeItem("habitrak-myday-v1");}catch(_){} const v=S.view, tb=S.tab; fresh(); S.view=v; S.tab=tb; widgetMsg=null; render(); toast("Sample day restored",null); });
 }
 
 /* ---- view switching ---- */
-function setView(v){ $("toast").hidden=true; clearTimeout(toastTimer); widgetMsg=null; undoFn=null; S.view=v; if(v==="setup"){ S.step=1; S.sel=FIRST_RUN.slice(); } save(); render(); }
+function setView(v){ $("toast").hidden=true; clearTimeout(toastTimer); widgetMsg=null; undoFn=null; S.view=v; if(v==="setup"){ S.step=1; S.sel=FIRST_RUN.slice(); S.entries=[]; S.goals={}; } save(); render(); }
 document.querySelectorAll(".views button").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.v)));
 $("open-app").addEventListener("click",()=>{S.tab="today"; setView("app");});
 
