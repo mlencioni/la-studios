@@ -7,16 +7,18 @@ Rules and fees change. Each item marked **verify** must be checked against curre
 - [x] Audit 2.0 from marketing and everyday-user views ([01](01-ux-audit-2.0.md))
 - [x] MVP spec with My Day as the primary widget ([02](02-mvp-spec.md))
 - [x] Interactive prototype (`prototype/my-day.html`)
-- [ ] Mark approves the open decisions in spec section 8
+- [x] Mark approves the open decisions in spec section 8 (Oct 5, 2026)
+- [ ] Play Store name search and domain check for Habitrak
 - [ ] 5 hallway tests of the prototype on a real Android phone; log results in [iteration log](iteration-log.md)
 - [ ] Icon, wordmark, 5 screenshots
 
 ## Stage 1. Build
 
-- [ ] Repo scaffold: web app (Vercel) + Capacitor Android project
+- [ ] Repo scaffold: web app (Vercel) + Capacitor Android project (no Trusted Web Activity)
 - [ ] Local SQLite store shared by web UI and widget
 - [ ] Glance widget 4×2 and 1×1; Quick Settings tile; ongoing notification for stretches
-- [ ] Supabase sync with row-level security; sign-in optional
+- [ ] No account at first launch; backup prompt on day 3
+- [ ] Supabase sync with row-level security, only after backup is turned on
 - [ ] TalkBack pass; font scale 200% pass; dark theme pass
 - [ ] Import of Mark's 2.0 history as the first real dataset
 

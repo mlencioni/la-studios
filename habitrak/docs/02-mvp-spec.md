@@ -1,7 +1,7 @@
 # Habitrak MVP: My Day
 
 **Owner:** LA Studios, Marketing and User Usability Director
-**Status:** Draft 1, Oct 1, 2026. Needs Mark's sign-off on the open decisions at the end.
+**Status:** Draft 2, Oct 5, 2026. All four open decisions approved by Mark on Oct 5 (section 8).
 **Prototype:** [`../prototype/my-day.html`](../prototype/my-day.html), also published as the *Habitrak My Day* artifact.
 
 ## 1. Positioning
@@ -93,17 +93,18 @@ Brand names, prices, spend math, streaks, social features, ads, AI insights.
 - No "quit", "fail", "relapse", "streak broken". Goals say "ceiling" and "wait".
 - Every toast names what happened: "Coffee logged · 2:47 PM". Always with Undo.
 
-## 6. Architecture decision needed (Android)
+## 6. Architecture (decided Oct 5, 2026)
 
-The Commercialization Plan uses a **Trusted Web Activity** for Android. A TWA can't host a home-screen widget, a Quick Settings tile, or an ongoing notification. Options:
+Habitrak ships in a **Capacitor** shell on both Android and iOS. The original plan's Android Trusted Web Activity is dropped, because a TWA can't host a home-screen widget, a Quick Settings tile, or an ongoing notification.
 
-| Option | Widget | Effort | Recommendation |
-|---|---|---|---|
-| **A. Capacitor (Android + iOS)**, web UI plus a small native Kotlin/Glance widget module sharing a local SQLite store | Yes | Medium. One web codebase; ~1 native module per platform | **Recommended.** Same shell on both stores; iOS widget for Guideline 4.2 comes from the same pattern |
-| B. TWA plus a separate native widget app | Awkward: two processes, two stores of data | Medium-high | No |
-| C. Full native (Kotlin/Compose, then Swift) | Yes, best feel | High; two codebases | Only if A fails review or performance |
+| Layer | Choice |
+|---|---|
+| App UI | The web app (Vercel build), loaded in Capacitor |
+| Widget, Quick Settings tile, ongoing notification | Native Kotlin module with Jetpack Glance (Android); WidgetKit later on iOS |
+| On-device data | SQLite, shared by the web UI and the widget. Every tap is written here first, so logging works offline and instantly |
+| Backup and sync | Supabase with row-level security, only after the user turns on backup |
 
-Data path under A: widget taps write to on-device SQLite first (works offline, instant), and the app syncs to Supabase with row-level security when signed in.
+Full native (Kotlin/Compose, then Swift) stays the fallback if Capacitor fails store review or widget performance targets.
 
 ## 7. Acceptance criteria for "MVP design done"
 
@@ -113,9 +114,12 @@ Data path under A: widget taps write to on-device SQLite first (works offline, i
 4. Every 2.0 feature is either in the MVP, scheduled in section 4, or explicitly cut.
 5. Store listing draft, icon, and 5 screenshots approved.
 
-## 8. Open decisions for Mark
+## 8. Decisions (approved by Mark, Oct 5, 2026)
 
-1. **Android shell:** approve Capacitor (option A) instead of TWA.
-2. **Name lock:** Habitrak, after a Play Store and domain search.
-3. **Smoke and Drink presets visible at onboarding?** Recommendation: yes, in the list, not pre-selected.
-4. **Account at first launch?** Recommendation: no; offer it after day 3 for backup.
+| # | Decision |
+|---|---|
+| 1 | Android shell is **Capacitor**, not a Trusted Web Activity |
+| 2 | Name locked: **Habitrak**, everywhere (app, listing, docs, agents). Play Store and domain availability still to be checked |
+| 3 | Smoke and Drink appear at sign-up but are **not pre-selected** |
+| 4 | **No account at first launch.** Logs stay on the phone; backup is offered after day 3 |
+| 5 | Repo workflow: commit straight to the branch until MVP; pull requests start after MVP |

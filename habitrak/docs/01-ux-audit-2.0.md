@@ -48,7 +48,7 @@ Persona: *Dana, 38, works shifts, not technical.* Dana wants to know where the d
 
 The current plan ships Android as a **Trusted Web Activity** (TWA). A TWA is a full-screen browser tab. It **cannot provide a home-screen widget**, a Quick Settings tile, or an ongoing notification with a Stop button. If My Day is the primary widget, the TWA plan doesn't work as written.
 
-Recommendation, for Mark's decision: use **Capacitor on Android as well as iOS**. The web app stays the app; a small native Kotlin module provides the widget (Jetpack Glance) and writes into the same local store the web app reads. This also lines up Android with the iOS plan, which already needs a widget for Guideline 4.2. Details in [`02-mvp-spec.md`](02-mvp-spec.md).
+**Decided Oct 5, 2026:** use **Capacitor on Android as well as iOS**. The web app stays the app; a small native Kotlin module provides the widget (Jetpack Glance) and writes into the same local store the web app reads. This also lines up Android with the iOS plan, which already needs a widget for Guideline 4.2. Details in [`02-mvp-spec.md`](02-mvp-spec.md).
 
 ## Bottom line
 

@@ -18,4 +18,6 @@ The first L&A Studios product. This folder tracks Habitrak from the 2.0 prototyp
 
 ## Status
 
-**Stage 0, design lock.** Waiting on Mark's decisions in spec section 8.
+**Stage 0, design lock.** Decisions approved Oct 5, 2026 (spec section 8). Next: name check, then hallway tests of the prototype.
+
+**Workflow:** commit straight to the working branch until MVP. Pull requests start after MVP.

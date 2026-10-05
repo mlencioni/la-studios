@@ -28,6 +28,7 @@
   --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966;
   color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{background:var(--bg)}
 body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:20px 48px;font-variant-numeric:tabular-nums}
 button,input{font:inherit;color:inherit}
@@ -283,6 +284,7 @@ function seedWeek(){
   return out;
 }
 const DEF={sel:["work","coffee","walk","water","meal","smoke","rest","sleep"],goals:{smoke:{cap:6,wait:60},coffee:{cap:4,wait:0}}};
+const FIRST_RUN=["work","coffee","walk","water","meal"]; /* fresh install: Smoke and Drink offered, not pre-picked */
 let S={}; const week=seedWeek();
 function fresh(){const t=seedToday(); S={sel:DEF.sel.slice(),goals:JSON.parse(JSON.stringify(DEF.goals)),entries:t.entries,next:t.next,view:"home",tab:"today",step:1};}
 function save(){try{localStorage.setItem("habitrak-myday-v1",JSON.stringify({sel:S.sel,goals:S.goals,view:S.view,tab:S.tab}));}catch(_){}}
@@ -469,7 +471,7 @@ const NOTES={
     "<b>The Now line</b> answers the first question anyone has: what am I doing, and for how long.",
     "<b>The ribbon starts at wake time</b> (6 AM here), so a late night still belongs to today.",
     "<b>No numbers that need explaining.</b> Tiles show counts or Start. Goals show only as \"3 of 6\".",
-    "<b>Android build adds</b> a Quick Settings tile and an ongoing notification with Stop while a stretch runs. A Trusted Web Activity can't do any of this, so the spec proposes Capacitor."],
+    "<b>Android build adds</b> a Quick Settings tile and an ongoing notification with Stop while a stretch runs. That's why Habitrak ships in Capacitor, not a Trusted Web Activity."],
     tryit:"Try it: tap Coffee, then Walk. Work stops and Walk starts. Undo appears in the widget for 5 seconds."},
   today:{h:"Today: the full picture, still one tap",items:[
     "<b>Same tiles as the widget</b>, all 8, so nothing new to learn.",
@@ -491,7 +493,7 @@ const NOTES={
   setup:{h:"First run: two screens",items:[
     "<b>Screen 1: pick what to track.</b> Smoke and Drink are listed but not pre-picked, so the app reads as a day tracker first.",
     "<b>Screen 2: add the widget.</b> On Android this triggers the pin-widget prompt.",
-    "<b>No account up front.</b> It works offline from the first tap; backup is offered after day 3.",
+    "<b>No account at first launch.</b> Logs stay on the phone from the first tap; backup is offered after day 3.",
     "<b>Target:</b> first log within 60 seconds of install, in 5 of 5 hallway tests."]}
 };
 function renderNotes(){
@@ -500,13 +502,13 @@ function renderNotes(){
   if(n.kinds) h+='<div class="kinds"><div><b>Moment</b>Tap when it happens. Coffee, Water, Smoke.</div><div><b>Stretch</b>Tap to start, tap again to stop. Work, Walk, Sleep.</div></div>';
   h+='<ol>'+n.items.map(i=>'<li>'+i+'</li>').join("")+'</ol>';
   if(n.tryit) h+='<p class="try">'+n.tryit+'</p>';
-  h+='<div class="meta"><span>Draft 1 · Oct 1, 2026 · LA Studios Marketing and Usability</span><button type="button" id="reset">Reset sample day</button></div>';
+  h+='<div class="meta"><span>Draft 2 · Oct 5, 2026 · LA Studios Marketing and Usability</span><button type="button" id="reset">Reset sample day</button></div>';
   $("notes").innerHTML=h;
   $("reset").addEventListener("click",()=>{ try{localStorage.removeItem("habitrak-myday-v1");}catch(_){} const v=S.view, tb=S.tab; fresh(); S.view=v; S.tab=tb; widgetMsg=null; render(); toast("Sample day restored",null); });
 }
 
 /* ---- view switching ---- */
-function setView(v){ $("toast").hidden=true; clearTimeout(toastTimer); widgetMsg=null; undoFn=null; S.view=v; if(v==="setup") S.step=1; save(); render(); }
+function setView(v){ $("toast").hidden=true; clearTimeout(toastTimer); widgetMsg=null; undoFn=null; S.view=v; if(v==="setup"){ S.step=1; S.sel=FIRST_RUN.slice(); } save(); render(); }
 document.querySelectorAll(".views button").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.v)));
 $("open-app").addEventListener("click",()=>{S.tab="today"; setView("app");});
 
