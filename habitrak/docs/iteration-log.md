@@ -7,7 +7,8 @@ Newest first. Each entry: what changed, why, and what's next.
 - **Approved by Mark:** Capacitor on Android (TWA dropped); name locked as Habitrak; Smoke and Drink offered at sign-up, not pre-selected; no account at first launch, backup offered after day 3.
 - **Updated:** MVP spec (sections 6 and 8), Android release path, prototype notes, and the Commercialization Plan doc (renamed to Habitrak, stack table, Oct 5 decisions, phase 2, Road to publish).
 - **Workflow:** commits go straight to the branch until MVP; no pull requests yet.
-- **Next:** name and domain check, then hallway tests.
+- **Also decided:** hallway tests come before any build, on an older Samsung Galaxy to check backward compatibility; web home is habitrak.lencioni.io; Play Console isn't set up yet, so the D-U-N-S request starts now.
+- **Next:** run the 5 hallway tests with the [test kit](05-hallway-test-kit.md).
 
 ## Oct 1, 2026: My Day direction set
 

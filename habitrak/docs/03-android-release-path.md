@@ -8,26 +8,29 @@ Rules and fees change. Each item marked **verify** must be checked against curre
 - [x] MVP spec with My Day as the primary widget ([02](02-mvp-spec.md))
 - [x] Interactive prototype (`prototype/my-day.html`)
 - [x] Mark approves the open decisions in spec section 8 (Oct 5, 2026)
-- [ ] Play Store name search and domain check for Habitrak
-- [ ] 5 hallway tests of the prototype on a real Android phone; log results in [iteration log](iteration-log.md)
+- [ ] Play Store name search for Habitrak
+- [x] Web home decided: habitrak.lencioni.io (Oct 5, 2026)
+- [ ] 5 hallway tests on Mark's Samsung Galaxy using the [test kit](05-hallway-test-kit.md); log results in the [iteration log](iteration-log.md)
 - [ ] Icon, wordmark, 5 screenshots
 
 ## Stage 1. Build
 
+- [ ] Decide the oldest Android version Habitrak supports (minSdk), based on the old test Galaxy and what Capacitor and Jetpack Glance require (**verify** both); the app still targets the current API level Play requires
 - [ ] Repo scaffold: web app (Vercel) + Capacitor Android project (no Trusted Web Activity)
 - [ ] Local SQLite store shared by web UI and widget
-- [ ] Glance widget 4×2 and 1×1; Quick Settings tile; ongoing notification for stretches
+- [ ] Glance widget 4×2 and 1×1, checked on Samsung One UI 4×5 and 5×5 home grids; Quick Settings tile; ongoing notification for stretches
 - [ ] No account at first launch; backup prompt on day 3
 - [ ] Supabase sync with row-level security, only after backup is turned on
 - [ ] TalkBack pass; font scale 200% pass; dark theme pass
+- [ ] Old-phone pass on the test Galaxy: cold start time, tap-to-feedback under 300 ms, battery use of the ongoing notification, older Android WebView
 - [ ] Import of Mark's 2.0 history as the first real dataset
 
 ## Stage 2. Play Console
 
-- [ ] D-U-N-S number for Lencioni & Associates
+- [ ] D-U-N-S number for Lencioni & Associates (start now: it can take weeks; not set up as of Oct 5, 2026)
 - [ ] Play Console account as an **organization** (personal accounts created after Nov 2023 must run a closed test with a minimum number of testers for a minimum number of days before production; **verify** current numbers)
 - [ ] App signing by Google Play; upload key stored in the password manager
-- [ ] Privacy policy and account-deletion URL on the Vercel site
+- [ ] Privacy policy and account-deletion page at habitrak.lencioni.io (Vercel, DNS record in lencioni.io)
 - [ ] Data safety form: data collected (app activity, health-adjacent), encrypted in transit, deletable
 - [ ] Health apps declaration (**verify** whether tracking alcohol and tobacco counts as health features)
 - [ ] Content rating questionnaire. Alcohol and tobacco references may raise the rating; listing copy leads with day tracking

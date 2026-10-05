@@ -123,3 +123,5 @@ Full native (Kotlin/Compose, then Swift) stays the fallback if Capacitor fails s
 | 3 | Smoke and Drink appear at sign-up but are **not pre-selected** |
 | 4 | **No account at first launch.** Logs stay on the phone; backup is offered after day 3 |
 | 5 | Repo workflow: commit straight to the branch until MVP; pull requests start after MVP |
+| 6 | Web home for MVP: **habitrak.lencioni.io** (privacy policy, account deletion, support). A dedicated domain can come later |
+| 7 | Next step: **hallway tests before building**, on an **older Samsung Galaxy** to check backward compatibility. The oldest supported Android version is set from that phone before the build starts |
