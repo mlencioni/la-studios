@@ -11,19 +11,20 @@ Rules and fees change. Each item marked **verify** must be checked against curre
 - [ ] Play Store name search for Habitrak
 - [x] Web home decided: habitrak.lencioni.io (Oct 5, 2026)
 - [x] Private test step 1: design walkthrough of the prototype, Oct 5, 2026 ([findings](06-walkthrough-findings.md))
-- [ ] Private test step 2: Mark uses the prototype on the old Galaxy (start date: Mark's call)
+- [ ] Private test step 2: Mark uses the prototype on the Galaxy S5 Active and Motorola Razr 2020 (start date: Mark's call)
 - [ ] Icon, wordmark, 5 screenshots
 
 ## Stage 1. Build
 
-- [ ] Decide the oldest Android version Habitrak supports (minSdk), based on the old test Galaxy and what Capacitor and Jetpack Glance require (**verify** both); the app still targets the current API level Play requires
+- [ ] Decide the oldest Android version Habitrak supports. Proposal: **Android 6.0 (API 23)**, matching the Galaxy S5 Active, if the Capacitor and Jetpack Glance versions we build on still allow it (**verify** both; newer releases may require Android 7 or later). The app still targets the current API level Play requires
+- [ ] Foldable check on the Razr 2020: fold and unfold keep state; ongoing notification on the outer display
 - [ ] Repo scaffold: web app (Vercel) + Capacitor Android project (no Trusted Web Activity)
 - [ ] Local SQLite store shared by web UI and widget
 - [ ] Glance widget 4×2 and 1×1, checked on Samsung One UI 4×5 and 5×5 home grids; Quick Settings tile; ongoing notification for stretches
 - [ ] No account at first launch; backup prompt on day 3
 - [ ] Supabase sync with row-level security, only after backup is turned on
 - [ ] TalkBack pass; font scale 200% pass; dark theme pass
-- [ ] Old-phone pass on the test Galaxy: cold start time, tap-to-feedback under 300 ms, battery use of the ongoing notification, older Android WebView
+- [ ] Old-phone pass on the Galaxy S5 Active: cold start time, tap-to-feedback under 300 ms, battery use of the ongoing notification, older Android WebView
 - [ ] Import of Mark's 2.0 history as the first real dataset
 
 ## Stage 2. Play Console

@@ -7,7 +7,7 @@
 | Step | Who | When | What it catches | What it can't catch |
 |---|---|---|---|---|
 | 1. Design walkthrough | Claude, as the usability director | Now | Unclear labels, dead ends, steps a first-timer can't guess, layout problems at phone width and large font | How real people actually behave |
-| 2. Mark's own use | Mark, on an older Samsung Galaxy | When Mark decides | Friction in daily logging, speed on old hardware, older-browser problems | Whether a stranger understands it (Mark knows the design too well) |
+| 2. Mark's own use | Mark, on a Galaxy S5 Active and a Motorola Razr 2020 | When Mark decides | Friction in daily logging, speed on old hardware, older-browser problems | Whether a stranger understands it (Mark knows the design too well) |
 | 3. Closed test | 10 to 20 invited testers on Google Play | At MVP | Real first-time understanding, the 60-second first log, what makes people stop | Nothing before MVP; that's the point |
 
 Findings from every step go in the [iteration log](iteration-log.md).
@@ -31,15 +31,26 @@ Any "no" is a finding, rated **Blocker** (task can't be done), **Major** (done, 
 
 ## Step 2: Mark's own use
 
-**Phone setup:** record the Galaxy's model and Android version (Settings > About phone > Software information). Update Chrome and Samsung Internet as far as the phone allows. The prototype needs a browser from about 2021 or later (Chrome 88 or newer).
+**Test phones.** Between them, the two phones cover the oldest, smallest screen we'll support and a newer, tall, folding one. Figures below are from memory; confirm each on the phone (Settings > About phone).
+
+| | Galaxy S5 Active (2014) | Motorola Razr 2020 (folding) |
+|---|---|---|
+| Role | Floor: oldest Android and smallest screen | Newer Android, tall screen, fold, small outer display |
+| Android, expected | 6.0.1 at most (API level 23) | Android 10 at launch, likely updated to 11 or later |
+| Screen, roughly | 360 × 640 dp, 16:9 | About 370 dp wide, very tall (21:9) |
+| Newest Chrome, expected | About Chrome 106; Android 6 stopped getting Chrome updates in 2022 | Current Chrome |
+| What to watch | Speed on old hardware, whether everything fits without scrolling, tap response | Folding and unfolding mid-task, the tall screen, whether the "Work · 42m" notification shows on the outer display |
+| Model and Android version, as checked | ______ | ______ |
+
+**Phone setup:** update Chrome on each phone as far as it allows. The prototype needs Chrome 88 or newer, so both should work. If the Claude app won't install on the S5, open the prototype link in Chrome while signed in to claude.ai. The prototype now fits the S5's shorter screen without scrolling to reach the bottom bar.
 
 **Each day, for as long as Mark chooses:**
 
 - Log a real day in the prototype (it resets on reload, so this is about feel, not data).
 - Note anything slow, confusing, or annoying, with the time. Feedback after a tap should feel instant (spec target: under 300 ms).
 - Try one session at the largest font size (Settings > Display > Font size).
+- On the Razr: fold and unfold while a stretch is running and while editing an entry. Nothing should be lost.
 
-Phone: model ______, Android version ______, browser and version ______
 
 ## Step 3: Closed test survey (at MVP)
 

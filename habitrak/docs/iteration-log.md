@@ -2,6 +2,13 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 5, 2026: Test phones named
+
+- **Phones:** Galaxy S5 Active (2014, expected Android 6.0.1) as the oldest phone Habitrak supports, and Motorola Razr 2020 (folding, tall screen, outer display). Android versions to be confirmed on the phones.
+- **Proposed:** minimum Android 6.0 (API 23), if the build tools still allow it.
+- **Fixed:** on short screens like the S5's, the prototype now fits the screen without scrolling to reach the bottom bar.
+- **Staying at 9 trackers:** Mark reviewed a 12-tracker mockup and kept 9.
+
 ## Oct 5, 2026: Tracker limit raised to 9
 
 - **Changed (Mark's call):** up to 9 trackers instead of 8, so Today's tile grid is a full 3×3 with no gap. The widget still shows the first 4.

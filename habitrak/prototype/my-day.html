@@ -47,7 +47,18 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 /* ---------- phone ---------- */
 .phone{width:360px;max-width:100%;margin:0 auto;background:var(--bezel);border-radius:44px;padding:10px;box-shadow:0 18px 50px #0000002e}
 .screen{position:relative;height:740px;border-radius:34px;overflow:hidden;background:var(--paper);display:flex;flex-direction:column}
-@media (max-width:480px){.phone{width:calc(100% + 32px);max-width:none;margin-inline:-16px;padding:0;border-radius:0;background:transparent;box-shadow:none}.screen{height:680px;border-radius:0}}
+@media (max-width:480px){
+  body{padding-block:8px 24px}
+  .wrap{gap:8px}
+  header.top{gap:6px;align-items:center}
+  .mark svg{width:28px;height:28px}
+  .mark h1{font-size:1.3rem}
+  .mark p{display:none}
+  .views button{padding:4px 10px;min-height:36px;font-size:.85rem}
+  .phone{width:calc(100% + 32px);max-width:none;margin-inline:-16px;padding:0;border-radius:0;background:transparent;box-shadow:none}
+  .screen{height:calc(100vh - 104px);min-height:420px;max-height:740px;border-radius:0}
+}
+@media (max-width:480px) and (max-height:620px){ #v-home .homegrid{gap:8px;padding-top:8px} #v-home .clock{font-size:2.2rem} #v-home .wcap{display:none} }
 .sbar{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 4px;font-size:.82rem;font-weight:500;flex:none}
 .sbar svg{width:44px;height:12px}
 .view{flex:1;min-height:0;display:flex;flex-direction:column}
