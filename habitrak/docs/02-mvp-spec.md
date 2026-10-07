@@ -27,7 +27,7 @@ The home-screen widget **is** the product. The app exists to set it up and to lo
 | Kind | One tap does | Examples | Shown as |
 |---|---|---|---|
 | **Moment** | Logs one, right now | Coffee, Water, Smoke, Drink, Meal, Snack, Meds | A tick on the day ribbon and a count on the tile |
-| **Stretch** | Starts it; tap again to stop. Starting another stops the current one | Work, Walk, Commute, Rest, Screen time, Sleep | A colored band on the day ribbon; "Now: Work · 1h 12m" |
+| **Stretch** | Starts it; tap again to stop. Starting another stops the current one | Work, Walk, Commute, Rest, Screen time, Sleep, Stretch, Workout | A colored band on the day ribbon; "Now: Work · 1h 12m" |
 
 Only one stretch runs at a time. That keeps the model simple enough to explain in one sentence: *"Tap a moment when it happens. Tap a stretch to start it, tap again to stop."*
 

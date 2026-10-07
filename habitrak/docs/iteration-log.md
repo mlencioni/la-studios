@@ -2,6 +2,15 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 7, 2026: Habitrak 3.0, working web app
+
+- **Built:** [Habitrak 3.0](https://claude.ai/artifact/3oHbVb1zqH7pzWgEJS4czT), the My Day design as a usable web app (source: `app/habitrak-3.html`). No sample data and no mock home screen; real clock.
+- **Saving:** each person's log is private to their Claude account (one document per day under their own data area). Outside Claude it falls back to saving in the browser, and says so.
+- **Includes:** first run (pick trackers, set day start), Today (Now card with Stop, day ribbon, 3×3 tiles, timeline with Edit, end-time editing for stretches, Delete, Undo), Week (7 ribbons, averages over days logged), Goals (most a day, wait between), Trackers (picks, day start, erase everything).
+- **Added (Mark's call):** Stretch and Workout in the stretches list, in the app and the prototype.
+- **Not in the web form:** home-screen widget, Quick Settings tile, notifications. Those need the Android build.
+- **Next:** Mark uses it on the Galaxy S5 Active and Razr 2020 (private test step 2).
+
 ## Oct 5, 2026: Test phones named
 
 - **Phones:** Galaxy S5 Active (2014, expected Android 6.0.1) as the oldest phone Habitrak supports, and Motorola Razr 2020 (folding, tall screen, outer display). Android versions to be confirmed on the phones.

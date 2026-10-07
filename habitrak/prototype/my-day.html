@@ -9,7 +9,7 @@
   --brand:#1C6A61; --on-brand:#FFFFFF; --brand-soft:#D3E7E2;
   --wall-a:#BFD9D2; --wall-b:#E7D7C3; --widget:#FFFFFFEE; --tile:#EEF3F1; --bezel:#1B2120; --hatch:#00000010;
   --t-work:#3E63A8; --t-walk:#2F8A5B; --t-commute:#6B7480; --t-rest:#8A6BC1; --t-screen:#B5507A; --t-sleep:#33407A;
-  --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B;
+  --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B; --t-stretch:#2E8C7E; --t-workout:#C0512F;
   --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
   --f-body:"Roboto Flex",Roboto,"Segoe UI",system-ui,sans-serif;
 }
@@ -18,14 +18,14 @@
   --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B;
   --wall-a:#1E3A35; --wall-b:#3A2E22; --widget:#1E2625EE; --tile:#26302E; --bezel:#050707; --hatch:#FFFFFF0D;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
-  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966;
+  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121716; --paper:#1A2120; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
   --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B;
   --wall-a:#1E3A35; --wall-b:#3A2E22; --widget:#1E2625EE; --tile:#26302E; --bezel:#050707; --hatch:#FFFFFF0D;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
-  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966;
+  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A;
   color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -254,12 +254,14 @@ const IC={
   commute:'<path d="M4 16l2-6.5h12l2 6.5v3H4z"/><path d="M4 16h16M7.5 19v2M16.5 19v2"/><circle cx="7.5" cy="16" r=".5"/><circle cx="16.5" cy="16" r=".5"/>',
   rest:'<path d="M4 12v5h16v-5M6 12V8h12v4M5 17v2M19 17v2"/>',
   screen:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
-  sleep:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'
+  sleep:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  stretch:'<circle cx="12" cy="4.5" r="1.8"/><path d="M4.5 6.5L12 9l7.5-2.5M12 9v5M12 14l-3.5 7M12 14l3.5 7"/>',
+  workout:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>'
 };
 const CAT={
   coffee:{n:"Coffee",k:"m"}, water:{n:"Water",k:"m"}, meal:{n:"Meal",k:"m"}, snack:{n:"Snack",k:"m"},
   smoke:{n:"Smoke",k:"m"}, drink:{n:"Drink",k:"m"}, meds:{n:"Meds",k:"m"},
-  work:{n:"Work",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}
+  work:{n:"Work",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}, stretch:{n:"Stretch",k:"s"}, workout:{n:"Workout",k:"s"}
 };
 const col=id=>"var(--t-"+id+")";
 const svg=(id,cls)=>'<svg viewBox="0 0 24 24" aria-hidden="true"'+(cls?' class="'+cls+'"':'')+'>'+IC[id]+'</svg>';

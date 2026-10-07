@@ -7,6 +7,7 @@ The first L&A Studios product. This folder tracks Habitrak from the 2.0 prototyp
 | Live prototype in daily use | [Habitrak 2.0 artifact](https://claude.ai/artifact/9TCskQ9y2h9ki736ePsqCT) |
 | Product register and business plan | [Commercialization Plan doc](https://claude.ai/artifact/LVG8UNhDgwyzJfiSeRffcj) |
 | MVP design prototype | [`prototype/my-day.html`](prototype/my-day.html) |
+| **Habitrak 3.0, working web app** | [Artifact](https://claude.ai/artifact/3oHbVb1zqH7pzWgEJS4czT) · source [`app/habitrak-3.html`](app/habitrak-3.html) |
 
 ## Docs
 
