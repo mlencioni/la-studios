@@ -2,6 +2,15 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 7, 2026: Habitrak 3.0 replaces 2.0
+
+- **Mark's call:** 3.0 becomes his daily tracker. 2.0 stays untouched as a read-only backup.
+- **Must-haves added to 3.0:** Resisted (for any moment with a goal) and Gave a smoke away; morning check-in after Sleep (feel 1 to 5, symptoms, note) with the withdrawal caution kept from 2.0; Last 7 nights table on Week.
+- **Mac:** two-column layout on wide screens; same private log on phone and Mac.
+- **History:** 199 entries from 2.0 (146 smokes, 19 drinks, 2 waters, 18 resisted, 12 given, 2 nights) plus 2 check-ins and goals (smoke: 30 a day, 30 min wait; drink: 5 a night, 60 min wait) are staged in 3.0's private storage. The app files them into days in Mark's own time zone the first time he opens it, then marks the import done. Tested against a stand-in store: all 199 landed.
+- **Not carried (Mark's choice):** packs, bottle, spending, reason chips. Notes on old entries are kept and shown in the timeline.
+- **Voice logging:** new [skill instructions](../skills/habitrak-log/SKILL.md) for 3.0. Mark replaces the old skill in his claude.ai skills settings.
+
 ## Oct 7, 2026: Habitrak 3.0, working web app
 
 - **Built:** [Habitrak 3.0](https://claude.ai/artifact/3oHbVb1zqH7pzWgEJS4czT), the My Day design as a usable web app (source: `app/habitrak-3.html`). No sample data and no mock home screen; real clock.

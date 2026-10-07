@@ -122,6 +122,32 @@ table.tot tr:last-child td{border-bottom:0}
 .confirm div{display:flex;gap:8px;flex-wrap:wrap}
 .loading{padding:40px 16px;color:var(--muted);text-align:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.extras{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 14px}
+.xchip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;border-radius:12px;padding:0 12px 0 8px;min-height:44px;cursor:pointer;font-size:.88rem;color:var(--ink)}
+.xchip svg{width:18px;height:18px;stroke:var(--c);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.xchip b{color:var(--muted);font-weight:700;margin-left:2px}
+.checkin h3{margin:0 0 2px;font-size:1rem}
+.checkin p{margin:0 0 10px;color:var(--muted);font-size:.86rem}
+.feel{display:flex;gap:6px;margin-bottom:10px}
+.feel button{flex:1;min-width:0;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:700}
+.feel button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.feelkey{display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted);margin:-6px 0 10px}
+.checkin .chips{margin-bottom:10px}
+.checkin input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);min-height:44px;padding:0 10px;margin-bottom:10px}
+.checkin .row{display:flex;gap:8px;flex-wrap:wrap}
+.warn{border:2px solid var(--bad);border-radius:12px;padding:10px 12px;font-size:.88rem;margin-bottom:10px}
+.tl .note{display:block;color:var(--muted);font-size:.8rem;white-space:normal}
+.cols{display:block}
+.narrow{max-width:640px}
+@media (min-width:900px){
+  .app{max-width:1040px}
+  .appbar{padding:20px 28px 10px}
+  main{padding:4px 28px 110px}
+  .cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:start}
+  .tiles .tile{min-height:100px}
+  .navbar div{max-width:560px}
+  .toast{max-width:560px}
+}
 </style>
 
 <div class="app">
@@ -162,6 +188,7 @@ var CAT={
   smoke:{n:"Smoke",k:"m"}, drink:{n:"Drink",k:"m"}, meds:{n:"Meds",k:"m"},
   work:{n:"Work",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}, stretch:{n:"Stretch",k:"s"}, workout:{n:"Workout",k:"s"}
 };
+var SYMPTOMS=[["tired","Tired"],["foggy","Foggy"],["headache","Headache"],["nausea","Nausea"],["anxious","Anxious"],["shaky","Shaky"],["sweaty","Sweaty"],["fine","Fine"]];
 var MAX=9, FIRST_RUN=["coffee","work","water","walk","meal"];
 var MIN=60000, DAY=86400000;
 function col(id){return "var(--t-"+id+")";}
@@ -171,28 +198,35 @@ function fmt(t){return new Date(t).toLocaleTimeString([], {hour:"numeric",minute
 function hm(t){var d=new Date(t);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
 function dur(ms){var m=Math.max(0,Math.round(ms/MIN)); if(m<1) return "<1m"; return m<60? m+"m" : Math.floor(m/60)+"h"+(m%60? " "+(m%60)+"m":"");}
 function newId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function lower(tr){return CAT[tr].n.toLowerCase();}
+function done(e){return !e.as;}
+function myTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"";}catch(e){return "";}}
 
 /* ---------- settings and day math ---------- */
-var S=null;               // {sel, goals, dayStart, setup}
+var S=null;               // {sel, goals, dayStart, setup, tz}
 function startHM(){var p=(S&&S.dayStart||"05:00").split(":");return [+p[0]||0,+p[1]||0];}
 function keyOf(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function windowStart(key){var p=key.split("-"),h=startHM();return new Date(+p[0],+p[1]-1,+p[2],h[0],h[1],0,0).getTime();}
 function dayKey(t){var d=new Date(t),h=startHM(),s=new Date(d.getFullYear(),d.getMonth(),d.getDate(),h[0],h[1]); if(s.getTime()>t) s=new Date(d.getFullYear(),d.getMonth(),d.getDate()-1,h[0],h[1]); return keyOf(s);}
 function shift(key,n){var p=key.split("-");return keyOf(new Date(+p[0],+p[1]-1,+p[2]+n));}
 function windowEnd(key){return windowStart(shift(key,1));}
+function emptyDay(){return {entries:[],checkin:null};}
+function normDay(o){ o=o||{}; return {entries:(o.entries||[]).filter(function(e){return e&&CAT[e.tr]&&typeof e.t==="number";}).map(function(e){var x={id:e.id,tr:e.tr,t:e.t}; if(CAT[e.tr].k==="s") x.end=e.end==null?null:e.end; if(e.as) x.as=e.as; if(e.note) x.note=e.note; if(e.src) x.src=e.src; return x;}), checkin:o.checkin||null}; }
 
 /* ---------- storage: private per-person db, or this browser ---------- */
 var store=null, days={}, writing={}, dirty={}, saveState="ok";
 function setSave(state,text){ saveState=state; var el=$("save"); el.textContent=text; el.className="save"+(state==="err"?" err":""); }
 function remoteStore(db,uid){
-  var profile=db.doc("data/users/"+uid+"/profile"), dayCol=profile.collection("days");
+  var base="data/users/"+uid, profile=db.doc(base+"/profile"), dayCol=profile.collection("days"), imp=db.doc(base+"/import-v2");
   return {
     kind:"account",
     loadSettings:function(){return profile.get().then(function(s){return s.exists? s.data() : null;});},
     saveSettings:function(o){return profile.set(o);},
-    watchDay:function(key,cb){return dayCol.doc(key).onSnapshot(function(s){cb(s.exists? (s.data().entries||[]) : []);},function(e){onStoreError(e);});},
-    getDay:function(key){return dayCol.doc(key).get().then(function(s){return s.exists? (s.data().entries||[]) : [];});},
-    saveDay:function(key,entries){return entries.length? dayCol.doc(key).set({entries:entries,updated:Date.now()}) : dayCol.doc(key).delete();},
+    watchDay:function(key,cb){return dayCol.doc(key).onSnapshot(function(s){cb(normDay(s.exists? s.data() : null));},function(e){onStoreError(e);});},
+    getDay:function(key){return dayCol.doc(key).get().then(function(s){return normDay(s.exists? s.data() : null);});},
+    saveDay:function(key,day){return (day.entries.length||day.checkin)? dayCol.doc(key).set({entries:day.entries,checkin:day.checkin||null,updated:Date.now()}) : dayCol.doc(key).delete();},
+    getImport:function(){return imp.get().then(function(s){return s.exists? s.data() : null;});},
+    markImported:function(n){return imp.update({done:true,doneAt:Date.now(),imported:n});},
     erase:function(){return dayCol.get().then(function(q){var p=Promise.resolve(); q.docs.forEach(function(d){p=p.then(function(){return dayCol.doc(d.id).delete();});}); return p;}).then(function(){return profile.delete();});}
   };
 }
@@ -203,9 +237,11 @@ function localStore(){
     kind:"device",
     loadSettings:function(){return Promise.resolve(get("profile"));},
     saveSettings:function(o){put("profile",o);return Promise.resolve();},
-    watchDay:function(key,cb){cb((get("day:"+key)||{}).entries||[]);return function(){};},
-    getDay:function(key){return Promise.resolve((get("day:"+key)||{}).entries||[]);},
-    saveDay:function(key,entries){put("day:"+key,entries.length?{entries:entries}:null);return Promise.resolve();},
+    watchDay:function(key,cb){cb(normDay(get("day:"+key)));return function(){};},
+    getDay:function(key){return Promise.resolve(normDay(get("day:"+key)));},
+    saveDay:function(key,day){put("day:"+key,(day.entries.length||day.checkin)?{entries:day.entries,checkin:day.checkin||null}:null);return Promise.resolve();},
+    getImport:function(){return Promise.resolve(null);},
+    markImported:function(){return Promise.resolve();},
     erase:function(){try{Object.keys(localStorage).filter(function(k){return k.indexOf("habitrak3:")===0;}).forEach(function(k){localStorage.removeItem(k);});}catch(e){} return Promise.resolve();}
   };
 }
@@ -221,8 +257,7 @@ function persistDay(key){
   (function loop(){
     if(!dirty[key]){ writing[key]=false; if(saveState!=="err") setSave("ok",savedLabel()); return; }
     dirty[key]=false;
-    var clean=(days[key]||[]).map(function(e){var o={id:e.id,tr:e.tr,t:e.t}; if(CAT[e.tr].k==="s") o.end=e.end==null?null:e.end; return o;});
-    store.saveDay(key,clean).then(function(){ if(saveState==="err") setSave("ok",savedLabel()); loop(); },function(err){ onStoreError(err); writing[key]=false; });
+    store.saveDay(key,normDay(days[key])).then(function(){ if(saveState==="err") setSave("ok",savedLabel()); loop(); },function(err){ onStoreError(err); writing[key]=false; });
   })();
 }
 var settingsBusy=false, settingsDirty=false;
@@ -231,7 +266,7 @@ function persistSettings(){
   (function loop(){
     if(!settingsDirty){ settingsBusy=false; return; }
     settingsDirty=false;
-    store.saveSettings({sel:S.sel,goals:S.goals,dayStart:S.dayStart,setup:!!S.setup}).then(loop,function(err){onStoreError(err); settingsBusy=false;});
+    store.saveSettings({sel:S.sel,goals:S.goals,dayStart:S.dayStart,setup:!!S.setup,tz:S.tz||myTz()}).then(loop,function(err){onStoreError(err); settingsBusy=false;});
   })();
 }
 
@@ -239,10 +274,9 @@ function persistSettings(){
 var subs={}, todayKey=null;
 function watch(key){
   if(subs[key]) return;
-  subs[key]=store.watchDay(key,function(entries){
+  subs[key]=store.watchDay(key,function(day){
     if(writing[key]||dirty[key]) return;           // our own write is in flight; keep local state
-    days[key]=entries.map(function(e){return {id:e.id,tr:e.tr,t:e.t,end:e.end};}).filter(function(e){return CAT[e.tr];});
-    render();
+    days[key]=day; render();
   });
 }
 function syncDays(){
@@ -251,17 +285,17 @@ function syncDays(){
   todayKey=k;
   var keep=[k,shift(k,-1)];
   Object.keys(subs).forEach(function(x){ if(keep.indexOf(x)<0){ try{subs[x]();}catch(e){} delete subs[x]; } });
-  keep.forEach(function(x){ if(!days[x]) days[x]=[]; watch(x); });
+  keep.forEach(function(x){ if(!days[x]) days[x]=emptyDay(); watch(x); });
   return true;
 }
 
 /* ---------- queries over loaded entries ---------- */
-function liveEntries(){ var out=[]; [todayKey,shift(todayKey,-1)].forEach(function(k){ (days[k]||[]).forEach(function(e){ e._day=k; out.push(e); }); }); return out; }
+function liveEntries(){ var out=[]; [todayKey,shift(todayKey,-1)].forEach(function(k){ ((days[k]||{}).entries||[]).forEach(function(e){ e._day=k; out.push(e); }); }); return out; }
 function running(){ var r=null; liveEntries().forEach(function(e){ if(CAT[e.tr].k==="s"&&e.end==null&&(!r||e.t>r.t)) r=e; }); return r; }
-function inToday(e){ var a=windowStart(todayKey), b=windowEnd(todayKey); var end=CAT[e.tr].k==="s"? (e.end==null?Date.now():e.end) : e.t; return CAT[e.tr].k==="m"? (e.t>=a&&e.t<b) : (end>a && e.t<b); }
-function todayEntries(){ return liveEntries().filter(inToday); }
-function countToday(tr){ var a=windowStart(todayKey); return liveEntries().filter(function(e){return e.tr===tr&&e.t>=a;}).length; }
-function lastOf(tr){ var l=null; liveEntries().forEach(function(e){ if(e.tr===tr&&(!l||e.t>l.t)) l=e; }); return l; }
+function overlaps(e,a,b){ if(CAT[e.tr].k==="m") return e.t>=a&&e.t<b; var end=e.end==null?Date.now():e.end; return end>a&&e.t<b; }
+function todayEntries(){ var a=windowStart(todayKey), b=windowEnd(todayKey); return liveEntries().filter(function(e){return overlaps(e,a,b);}); }
+function countToday(tr,as){ var a=windowStart(todayKey); return liveEntries().filter(function(e){return e.tr===tr&&e.t>=a&&(as? e.as===as : done(e));}).length; }
+function lastOf(tr){ var l=null; liveEntries().forEach(function(e){ if(e.tr===tr&&done(e)&&(!l||e.t>l.t)) l=e; }); return l; }
 
 /* ---------- ribbon ---------- */
 function ribbon(entries,start,opts){
@@ -271,8 +305,10 @@ function ribbon(entries,start,opts){
   s+='<rect x="0" y="'+(H*0.3)+'" width="'+W+'" height="'+(H*0.55)+'" rx="'+(H*0.2)+'" fill="var(--hatch)"/>';
   entries.forEach(function(e){ if(CAT[e.tr].k!=="s") return; var a=x(e.t), b=x(e.end==null?n:e.end); if(b-a<0.3) return;
     s+='<rect x="'+a.toFixed(2)+'" y="'+(H*0.3)+'" width="'+(b-a).toFixed(2)+'" height="'+(H*0.55)+'" rx="1.5" fill="'+col(e.tr)+'"/>'; });
+  var r=(H>30?2.6:2.2);
   entries.forEach(function(e){ if(CAT[e.tr].k!=="m"||e.t<start||e.t>start+DAY) return;
-    s+='<circle cx="'+x(e.t).toFixed(2)+'" cy="'+(H*0.14+1)+'" r="'+(H>30?2.6:2.2)+'" fill="'+col(e.tr)+'"/>'; });
+    s+= done(e)? '<circle cx="'+x(e.t).toFixed(2)+'" cy="'+(H*0.14+1)+'" r="'+r+'" fill="'+col(e.tr)+'"/>'
+               : '<circle cx="'+x(e.t).toFixed(2)+'" cy="'+(H*0.14+1)+'" r="'+(r-0.5)+'" fill="none" stroke="'+col(e.tr)+'" stroke-width="1"/>'; });
   if(opts.now){ var a=x(n); s+='<rect x="'+(a-0.6).toFixed(2)+'" y="'+(H*0.22)+'" width="1.2" height="'+(H*0.72)+'" fill="var(--ink)"/>'; }
   return s+'</svg>';
 }
@@ -290,6 +326,13 @@ function tileHTML(tr){
   var aria=c.k==="m"? "Log "+c.n+", "+countToday(tr)+" today" : (on? "Stop "+c.n : "Start "+c.n);
   return '<button type="button" class="tile'+(on?" on":"")+'" data-tr="'+tr+'" style="--c:'+col(tr)+'" aria-label="'+esc(aria)+'">'+svg(tr)+'<span class="lbl">'+esc(c.n)+'</span><span class="val">'+esc(val)+'</span></button>';
 }
+/* Resist shows for moments with a goal; Gave away shows when Smoke is tracked. */
+function extrasHTML(){
+  var x=[];
+  S.sel.forEach(function(t){ var g=S.goals[t]; if(CAT[t].k==="m"&&g&&(g.cap||g.wait)){ var n=countToday(t,"resisted"); x.push('<button type="button" class="xchip" data-as="resisted" data-x="'+t+'" style="--c:'+col(t)+'">'+svg(t)+'Resisted '+esc(lower(t))+(n?'<b>'+n+'</b>':'')+'</button>'); } });
+  if(S.sel.indexOf("smoke")>=0){ var g=countToday("smoke","given"); x.push('<button type="button" class="xchip" data-as="given" data-x="smoke" style="--c:'+col("smoke")+'">'+svg("smoke")+'Gave a smoke away'+(g?'<b>'+g+'</b>':'')+'</button>'); }
+  return x.length? '<div class="extras" role="group" aria-label="Also log">'+x.join("")+'</div>' : '';
+}
 
 /* ---------- actions ---------- */
 var undoFn=null, toastTimer=null;
@@ -298,8 +341,8 @@ function toast(msg,undo){
   clearTimeout(toastTimer); toastTimer=setTimeout(function(){ $("toast").hidden=true; undoFn=null; },5000);
 }
 $("toastundo").addEventListener("click",function(){ if(undoFn) undoFn(); $("toast").hidden=true; undoFn=null; render(); });
-function addEntry(e){ var k=dayKey(e.t); if(!days[k]) days[k]=[]; days[k].push(e); persistDay(k); return k; }
-function removeEntry(e){ var k=e._day||dayKey(e.t); days[k]=(days[k]||[]).filter(function(x){return x.id!==e.id;}); persistDay(k); }
+function addEntry(e){ var k=dayKey(e.t); if(!days[k]) days[k]=emptyDay(); days[k].entries.push(e); persistDay(k); return k; }
+function removeEntry(e){ var k=e._day||dayKey(e.t); if(!days[k]) return; days[k].entries=days[k].entries.filter(function(x){return x.id!==e.id;}); persistDay(k); }
 function tap(tr){
   syncDays();
   var c=CAT[tr], t=Date.now();
@@ -317,10 +360,44 @@ function tap(tr){
   render();
   document.querySelectorAll('.tile[data-tr="'+tr+'"]').forEach(function(b){b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse");});
 }
+function tapExtra(tr,as){
+  syncDays();
+  var e={id:newId(),tr:tr,t:Date.now(),as:as}; addEntry(e);
+  toast((as==="given"?"Gave a "+lower(tr)+" away":"Resisted "+lower(tr))+" · "+fmt(e.t),function(){ removeEntry(e); });
+  render();
+}
 document.addEventListener("click",function(ev){
   var b=ev.target.closest(".tile[data-tr]"); if(b){ tap(b.dataset.tr); return; }
+  var x=ev.target.closest("[data-x]"); if(x){ tapExtra(x.dataset.x,x.dataset.as); return; }
   if(ev.target.closest("[data-stop]")){ var r=running(); if(r) tap(r.tr); }
 });
+
+/* ---------- morning check-in ---------- */
+var ci={feel:0,sym:[]};
+function wakeToCheck(){
+  if(S.sel.indexOf("sleep")<0) return null;
+  var d=days[todayKey]; if(!d||d.checkin) return null;
+  var a=windowStart(todayKey), s=null;
+  liveEntries().forEach(function(e){ if(e.tr==="sleep"&&e.end!=null&&e.end>=a&&e.end-e.t>=60*MIN&&(!s||e.end>s.end)) s=e; });
+  return s;
+}
+function checkinHTML(s){
+  var h='<div class="card checkin"><h3>Morning check-in</h3><p>Slept '+fmt(s.t)+' to '+fmt(s.end)+' · '+dur(s.end-s.t)+'. How do you feel?</p>';
+  h+='<div class="feel" role="group" aria-label="How you feel, 1 to 5">'+[1,2,3,4,5].map(function(n){return '<button type="button" data-feel="'+n+'" aria-pressed="'+(ci.feel===n)+'">'+n+'</button>';}).join("")+'</div><div class="feelkey"><span>Awful</span><span>Great</span></div>';
+  h+='<div class="chips" role="group" aria-label="Anything else">'+SYMPTOMS.map(function(x){return '<button type="button" class="chip" style="--c:var(--brand)" data-sym="'+x[0]+'" aria-pressed="'+(ci.sym.indexOf(x[0])>=0)+'">'+x[1]+'</button>';}).join("")+'</div>';
+  if(S.sel.indexOf("drink")>=0&&(ci.sym.indexOf("shaky")>=0||ci.sym.indexOf("sweaty")>=0)) h+='<div class="warn">Shakiness or sweating after drinking can be signs of withdrawal. Mention them to your doctor, and don\'t cut back sharply on your own.</div>';
+  h+='<input type="text" id="ci-note" placeholder="Note (optional)" aria-label="Morning note"><div class="row"><button type="button" class="pill" id="ci-save"'+(ci.feel?'':' disabled')+'>Save check-in</button><button type="button" class="pill tonal" id="ci-skip">Skip today</button></div></div>';
+  return h;
+}
+function bindCheckin(m,s){
+  m.querySelectorAll("[data-feel]").forEach(function(b){b.addEventListener("click",function(){ ci.feel=+b.dataset.feel; keepNote(); render(); });});
+  m.querySelectorAll("[data-sym]").forEach(function(b){b.addEventListener("click",function(){ var k=b.dataset.sym, i=ci.sym.indexOf(k); if(i>=0) ci.sym.splice(i,1); else { if(k==="fine") ci.sym=[]; else ci.sym=ci.sym.filter(function(x){return x!=="fine";}); ci.sym.push(k); } keepNote(); render(); });});
+  var note=$("ci-note"); if(note&&ci.note) note.value=ci.note;
+  $("ci-save").addEventListener("click",function(){ save({feel:ci.feel,sym:ci.sym.slice(),note:($("ci-note").value||"").trim(),at:Date.now(),sleep:s.id}); });
+  $("ci-skip").addEventListener("click",function(){ save({skipped:true,at:Date.now(),sleep:s.id}); });
+  function save(c){ days[todayKey].checkin=c; persistDay(todayKey); ci={feel:0,sym:[]}; toast(c.skipped?"Check-in skipped":"Check-in saved",function(){ days[todayKey].checkin=null; persistDay(todayKey); }); render(); }
+}
+function keepNote(){ var n=$("ci-note"); if(n) ci.note=n.value; }
 
 /* ---------- views ---------- */
 var tab="today", editing=null, confirmErase=false, weekCache=null;
@@ -330,87 +407,106 @@ function renderNav(){
 }
 $("navbtns").addEventListener("click",function(ev){ var b=ev.target.closest("[data-tab]"); if(!b) return; tab=b.dataset.tab; editing=null; confirmErase=false; if(tab==="week") weekCache=null; render(); window.scrollTo(0,0); });
 function head(t,s){ $("title").textContent=t; $("sub").textContent=s; }
+function label(e){ var c=CAT[e.tr]; if(e.as==="resisted") return "Resisted "+lower(e.tr); if(e.as==="given") return "Gave a "+lower(e.tr)+" away"; return c.n; }
 
 function renderToday(m){
-  var n=Date.now(), r=running();
+  var n=Date.now(), r=running(), wake=wakeToCheck();
   head("Today", new Date(n).toLocaleDateString([], {weekday:"long",month:"long",day:"numeric"}));
-  var h='<div class="card nowcard">';
-  if(r) h+='<span class="dot" style="background:'+col(r.tr)+'"></span><div class="txt"><b>Now · '+esc(CAT[r.tr].n)+'</b><span>Since '+fmt(r.t)+' · '+dur(n-r.t)+'</span></div><button type="button" class="pill tonal" data-stop>Stop</button>';
-  else h+='<span class="dot" style="background:var(--line)"></span><div class="txt"><b>Nothing running</b><span>Tap a stretch below to start one.</span></div>';
-  h+='</div><div class="card">'+ribbon(todayEntries(),windowStart(todayKey),{now:true,h:34,label:"Today so far"})+hourLabels()+'</div>';
-  h+='<p class="lbl2">Tap to log</p><div class="tiles">'+S.sel.map(tileHTML).join("")+'</div>';
-  var list=todayEntries().sort(function(a,b){return b.t-a.t;});
-  h+='<p class="lbl2">Timeline</p>';
-  if(!list.length) h+='<p class="empty">Nothing logged yet today. Tap a tile when something happens.</p>';
-  else h+='<ul class="tl">'+list.map(function(e){
+  var a='<div class="card nowcard">';
+  if(r) a+='<span class="dot" style="background:'+col(r.tr)+'"></span><div class="txt"><b>Now · '+esc(CAT[r.tr].n)+'</b><span>Since '+fmt(r.t)+' · '+dur(n-r.t)+'</span></div><button type="button" class="pill tonal" data-stop>Stop</button>';
+  else a+='<span class="dot" style="background:var(--line)"></span><div class="txt"><b>Nothing running</b><span>Tap a stretch below to start one.</span></div>';
+  a+='</div>';
+  if(wake) a+=checkinHTML(wake);
+  a+='<div class="card">'+ribbon(todayEntries(),windowStart(todayKey),{now:true,h:34,label:"Today so far"})+hourLabels()+'</div>';
+  a+='<p class="lbl2">Tap to log</p><div class="tiles">'+S.sel.map(tileHTML).join("")+'</div>'+extrasHTML();
+  var list=todayEntries().sort(function(x,y){return y.t-x.t;});
+  var b='<p class="lbl2">Timeline</p>';
+  if(!list.length) b+='<p class="empty">Nothing logged yet today. Tap a tile when something happens.</p>';
+  else b+='<ul class="tl">'+list.map(function(e){
     var c=CAT[e.tr], st=c.k==="s";
-    var what=st? c.n+" · "+(e.end==null? "now, "+dur(n-e.t) : dur(e.end-e.t)) : c.n;
+    var what=st? c.n+" · "+(e.end==null? "now, "+dur(n-e.t) : dur(e.end-e.t)) : label(e);
     var t=st? fmt(e.t).replace(/ ?[AP]M$/i,"")+"–"+(e.end==null?"now":fmt(e.end)) : fmt(e.t);
-    if(editing===e.id) return '<li class="editing"><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(c.n)+'</span>'+
+    if(editing===e.id) return '<li class="editing"><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(label(e))+'</span>'+
       '<label>'+(st?"Start":"Time")+'<input type="time" id="ed-start" value="'+hm(e.t)+'"></label>'+
       (st&&e.end!=null?'<label>End<input type="time" id="ed-end" value="'+hm(e.end)+'"></label>':'')+
       '<button type="button" data-save="'+e.id+'">Save</button><button type="button" class="del" data-del="'+e.id+'">Delete</button><button type="button" data-cancel>Cancel</button></li>';
-    return '<li><span class="t">'+t+'</span><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(what)+'</span><button type="button" data-edit="'+e.id+'" aria-label="Edit '+esc(c.n)+' at '+fmt(e.t)+'">Edit</button></li>';
+    return '<li><span class="t">'+t+'</span><span class="d" style="background:'+(done(e)?col(e.tr):'transparent')+';box-shadow:inset 0 0 0 2px '+col(e.tr)+'"></span><span class="w">'+esc(what)+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span><button type="button" data-edit="'+e.id+'" aria-label="Edit '+esc(label(e))+' at '+fmt(e.t)+'">Edit</button></li>';
   }).join("")+'</ul>';
-  m.innerHTML=h;
-  m.querySelectorAll("[data-edit]").forEach(function(b){b.addEventListener("click",function(){ editing=b.dataset.edit; render(); var i=$("ed-start"); if(i) i.focus(); });});
-  m.querySelectorAll("[data-cancel]").forEach(function(b){b.addEventListener("click",function(){ editing=null; render(); });});
-  m.querySelectorAll("[data-del]").forEach(function(b){b.addEventListener("click",function(){
-    var e=find(b.dataset.del); if(!e) return; var k=e._day; removeEntry(e); editing=null;
-    toast(CAT[e.tr].n+" deleted",function(){ if(!days[k]) days[k]=[]; days[k].push(e); persistDay(k); }); render(); });});
-  m.querySelectorAll("[data-save]").forEach(function(b){b.addEventListener("click",function(){
-    var e=find(b.dataset.save); if(!e) return;
+  m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
+  if(wake) bindCheckin(m,wake);
+  m.querySelectorAll("[data-edit]").forEach(function(x){x.addEventListener("click",function(){ editing=x.dataset.edit; render(); var i=$("ed-start"); if(i) i.focus(); });});
+  m.querySelectorAll("[data-cancel]").forEach(function(x){x.addEventListener("click",function(){ editing=null; render(); });});
+  m.querySelectorAll("[data-del]").forEach(function(x){x.addEventListener("click",function(){
+    var e=find(x.dataset.del); if(!e) return; var k=e._day; removeEntry(e); editing=null;
+    toast(label(e)+" deleted",function(){ if(!days[k]) days[k]=emptyDay(); days[k].entries.push(e); persistDay(k); }); render(); });});
+  m.querySelectorAll("[data-save]").forEach(function(x){x.addEventListener("click",function(){
+    var e=find(x.dataset.save); if(!e) return;
     var nt=atTime(e.t,$("ed-start").value), ne=e.end, endIn=$("ed-end");
     if(endIn) ne=atTime(e.end,endIn.value);
     if(nt==null||nt>Date.now()){ toast("Pick a start time before now",null); return; }
     if(endIn&&(ne==null||ne>Date.now())){ toast("Pick an end time before now",null); return; }
     if(CAT[e.tr].k==="s"&&ne!=null&&ne<=nt){ toast("The end has to be after the start",null); return; }
     var old={t:e.t,end:e.end}; e.t=nt; if(endIn) e.end=ne; persistDay(e._day); editing=null;
-    toast(CAT[e.tr].n+" updated",function(){ e.t=old.t; e.end=old.end; persistDay(e._day); }); render(); });});
+    toast(label(e)+" updated",function(){ e.t=old.t; e.end=old.end; persistDay(e._day); }); render(); });});
 }
 function find(id){ var r=null; liveEntries().forEach(function(e){ if(e.id===id) r=e; }); return r; }
 function atTime(base,v){ if(!v) return null; var p=v.split(":"), d=new Date(base); d.setHours(+p[0],+p[1],0,0); return d.getTime(); }
 
 function renderWeek(m){
   head("Week","Last 7 days · each row starts at "+fmt(windowStart(todayKey)));
-  var keys=[]; for(var i=-7;i<=0;i++) keys.push(shift(todayKey,i));
+  var keys=[]; for(var i=-8;i<=0;i++) keys.push(shift(todayKey,i));
+  var live=[todayKey,shift(todayKey,-1)];
   if(!weekCache){
     m.innerHTML='<p class="loading">Loading your week…</p>';
-    var past=keys.filter(function(k){return k!==todayKey&&k!==shift(todayKey,-1);});
+    var past=keys.filter(function(k){return live.indexOf(k)<0;});
     Promise.all(past.map(function(k){return store.getDay(k);})).then(function(res){ weekCache={}; past.forEach(function(k,i){ weekCache[k]=res[i]; }); if(tab==="week") render(); },function(e){ onStoreError(e); weekCache={}; if(tab==="week") render(); });
     return;
   }
-  function entriesOf(k){ return (k===todayKey||k===shift(todayKey,-1))? (days[k]||[]) : (weekCache[k]||[]); }
-  var h='<div class="card">', all=[], logged=0;
-  for(var j=keys.length-1;j>=1;j--){ var k=keys[j], st=windowStart(k), dt=new Date(st);
-    var own=entriesOf(k), shown=own.concat(entriesOf(keys[j-1]).filter(function(e){return CAT[e.tr].k==="s"&&(e.end==null?Date.now():e.end)>st;}));
-    if(own.length) logged++; all=all.concat(own);
-    h+='<div class="weekrow"><span><b>'+(k===todayKey?"Today":dt.toLocaleDateString([], {weekday:"short"}))+'</b>'+dt.getDate()+'</span>'+ribbon(shown,st,{h:20,now:k===todayKey,label:"Day ribbon"})+'</div>'; }
-  h+=hourLabels(true)+'</div>';
-  if(!all.length){ m.innerHTML=h+'<p class="empty">Your week fills in as you log. Each row is one day, dots are moments, bands are stretches.</p>'; return; }
-  var moments=S.sel.filter(function(t){return CAT[t].k==="m";}), top=null, best=0;
+  function dayOf(k){ return (live.indexOf(k)>=0? days[k] : weekCache[k])||emptyDay(); }
+  var pool=[]; keys.forEach(function(k){ dayOf(k).entries.forEach(function(e){ pool.push(e); }); });
+  var a='<div class="card">', inWeek=[], logged=0, rows=keys.slice(2);
+  for(var j=rows.length-1;j>=0;j--){ var k=rows[j], st=windowStart(k), en=windowEnd(k), dt=new Date(st);
+    var shown=pool.filter(function(e){return overlaps(e,st,en);}), mine=pool.filter(function(e){return e.t>=st&&e.t<en;});
+    if(mine.length) logged++; inWeek=inWeek.concat(mine);
+    a+='<div class="weekrow"><span><b>'+(k===todayKey?"Today":dt.toLocaleDateString([], {weekday:"short"}))+'</b>'+dt.getDate()+'</span>'+ribbon(shown,st,{h:20,now:k===todayKey,label:"Day ribbon"})+'</div>'; }
+  a+=hourLabels(true)+'</div>';
+  if(!inWeek.length){ m.innerHTML='<div class="narrow">'+a+'<p class="empty">Your week fills in as you log. Each row is one day, dots are moments, bands are stretches.</p></div>'; return; }
+  var all=inWeek.filter(done), moments=S.sel.filter(function(t){return CAT[t].k==="m";}), top=null, best=0;
   moments.forEach(function(t){ var c=all.filter(function(e){return e.tr===t;}).length; if(c>best){best=c; top=t;} });
   if(top&&best>=5){ var hrs=new Array(24).fill(0); all.forEach(function(e){ if(e.tr===top) hrs[new Date(e.t).getHours()]++; }); var hi=hrs.indexOf(Math.max.apply(null,hrs));
     var lab=function(x){var h12=x%12||12; return h12+(x<12?" AM":" PM");};
-    h+='<div class="obs"><b>'+esc(CAT[top].n)+'</b> happens most between '+lab(hi)+' and '+lab((hi+1)%24)+'.</div>'; }
+    a+='<div class="obs"><b>'+esc(CAT[top].n)+'</b> happens most between '+lab(hi)+' and '+lab((hi+1)%24)+'.</div>'; }
   var den=Math.max(1,logged);
-  h+='<p class="lbl2">Average a day <span style="text-transform:none;letter-spacing:0;font-weight:500">· '+logged+' day'+(logged===1?"":"s")+' logged</span></p><div class="card"><table class="tot">'+
-    moments.map(function(t){return '<tr><td>'+esc(CAT[t].n)+'</td><td>'+(all.filter(function(e){return e.tr===t;}).length/den).toFixed(1)+'</td></tr>';}).join("")+
-    S.sel.filter(function(t){return CAT[t].k==="s";}).map(function(t){ var ms=all.filter(function(e){return e.tr===t;}).reduce(function(a,e){return a+((e.end==null?Date.now():e.end)-e.t);},0); return '<tr><td>'+esc(CAT[t].n)+'</td><td>'+dur(ms/den)+'</td></tr>';}).join("")+
+  var b='<p class="lbl2">Average a day <span style="text-transform:none;letter-spacing:0;font-weight:500">· '+logged+' day'+(logged===1?"":"s")+' logged</span></p><div class="card"><table class="tot">'+
+    moments.map(function(t){ var rs=inWeek.filter(function(e){return e.tr===t&&e.as==="resisted";}).length;
+      return '<tr><td>'+esc(CAT[t].n)+(rs?' <span style="color:var(--muted)">· '+rs+' resisted this week</span>':'')+'</td><td>'+(all.filter(function(e){return e.tr===t;}).length/den).toFixed(1)+'</td></tr>';}).join("")+
+    S.sel.filter(function(t){return CAT[t].k==="s"&&t!=="sleep";}).map(function(t){ var ms=all.filter(function(e){return e.tr===t;}).reduce(function(x,e){return x+((e.end==null?Date.now():e.end)-e.t);},0); return '<tr><td>'+esc(CAT[t].n)+'</td><td>'+dur(ms/den)+'</td></tr>';}).join("")+
     '</table></div>';
-  m.innerHTML=h;
+  if(S.sel.indexOf("sleep")>=0){
+    var nights=[];
+    rows.slice().reverse().forEach(function(k){ var st=windowStart(k), en=windowEnd(k), s=null;
+      pool.forEach(function(e){ if(e.tr==="sleep"&&e.end!=null&&e.end>=st&&e.end<en&&e.end-e.t>=60*MIN&&(!s||e.end-e.t>s.end-s.t)) s=e; });
+      if(s) nights.push({k:k,s:s,c:dayOf(k).checkin}); });
+    b+='<p class="lbl2">Last 7 nights</p><div class="card">';
+    if(!nights.length) b+='<p class="empty">Tap Sleep when you go to bed and again when you wake up. Your nights show here.</p>';
+    else b+='<table class="tot"><tr><td style="color:var(--muted);font-size:.78rem">Woke</td><td style="color:var(--muted);font-size:.78rem;text-align:left">Bed to wake</td><td style="color:var(--muted);font-size:.78rem">Felt</td></tr>'+nights.map(function(x){
+      var w=new Date(x.s.end), c=x.c;
+      return '<tr><td>'+w.toLocaleDateString([], {weekday:"short",day:"numeric"})+'</td><td style="text-align:left;font-weight:500">'+fmt(x.s.t)+'–'+fmt(x.s.end)+' · '+dur(x.s.end-x.s.t)+'</td><td>'+(c&&c.feel? c.feel+" of 5" : "–")+'</td></tr>'; }).join("")+'</table>';
+    b+='</div>';
+  }
+  m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
 }
 
 function renderGoals(m){
   head("Goals","Optional, for anything you want less of");
   var mom=S.sel.filter(function(t){return CAT[t].k==="m";});
-  var h='<div class="obs">A ceiling is a line to stay under, not an amount to use up.</div>';
-  if(!mom.length){ m.innerHTML=h+'<p class="empty">Goals work on moments like Coffee or Smoke. Add one in Trackers.</p>'; return; }
+  var h='<div class="narrow"><div class="obs">A ceiling is a line to stay under, not an amount to use up. Setting a goal also adds a Resisted button on Today.</div>';
+  if(!mom.length){ m.innerHTML=h+'<p class="empty">Goals work on moments like Coffee or Smoke. Add one in Trackers.</p></div>'; return; }
   h+='<div class="card">'+mom.map(function(t){ var g=S.goals[t]||{cap:0,wait:0}, n=esc(CAT[t].n);
     return '<div class="goal" style="--c:'+col(t)+'"><span class="gi">'+svg(t)+'</span><b>'+n+'</b><div class="rows">'+
       '<div class="step"><span>Most a day<b>'+(g.cap||"Off")+'</b></span><div><button type="button" data-g="'+t+'" data-f="cap" data-d="-1" aria-label="Lower '+n+' daily most">−</button><button type="button" data-g="'+t+'" data-f="cap" data-d="1" aria-label="Raise '+n+' daily most">+</button></div></div>'+
       '<div class="step"><span>Wait between<b>'+(g.wait?dur(g.wait*MIN):"Off")+'</b></span><div><button type="button" data-g="'+t+'" data-f="wait" data-d="-15" aria-label="Shorter wait for '+n+'">−</button><button type="button" data-g="'+t+'" data-f="wait" data-d="15" aria-label="Longer wait for '+n+'">+</button></div></div>'+
-      '</div></div>'; }).join("")+'</div>';
+      '</div></div>'; }).join("")+'</div></div>';
   m.innerHTML=h;
   m.querySelectorAll("[data-g]").forEach(function(b){b.addEventListener("click",function(){
     var t=b.dataset.g, f=b.dataset.f, g=S.goals[t]||(S.goals[t]={cap:0,wait:0});
@@ -430,12 +526,12 @@ function bindPicker(m,onChange){
 }
 function renderTrackers(m){
   head("Trackers","What shows on Today, in this order");
-  var h='<p class="sub" style="margin-top:0">Up to '+MAX+'. The numbers set the order of your tiles. '+S.sel.length+' of '+MAX+' picked.</p>'+pickerHTML();
+  var h='<div class="narrow"><p class="sub" style="margin-top:0">Up to '+MAX+'. The numbers set the order of your tiles. '+S.sel.length+' of '+MAX+' picked.</p>'+pickerHTML();
   h+='<p class="lbl2">Settings</p><div class="card"><div class="field"><span>Day starts at<small>Late nights before this time count as the day before.</small></span><input type="time" id="daystart" value="'+esc(S.dayStart)+'" aria-label="Day starts at"></div>'+
-     '<div class="field"><span>Where your log is saved<small>'+(store.kind==="account"?"In your Claude account. Only you can see it.":"In this browser only. Open Habitrak inside Claude to save to your account.")+'</small></span></div>'+
+     '<div class="field"><span>Where your log is saved<small>'+(store.kind==="account"?"In your Claude account. Only you can see it, on any device where you're signed in.":"In this browser only. Open Habitrak inside Claude to save to your account.")+'</small></span></div>'+
      '<div class="field"><span>Erase everything<small>Every entry, goal and tracker choice. This can\'t be undone.</small></span><button type="button" class="pill danger" id="erase">Erase</button></div></div>';
   if(confirmErase) h+='<div class="confirm" id="confirmbox"><p><b>Erase your whole Habitrak log?</b> This can\'t be undone.</p><div><button type="button" class="pill danger" id="erase-yes">Erase everything</button><button type="button" class="pill tonal" id="erase-no">Keep it</button></div></div>';
-  m.innerHTML=h;
+  m.innerHTML=h+'</div>';
   bindPicker(m,persistSettings);
   $("daystart").addEventListener("change",function(ev){ if(!ev.target.value) return; S.dayStart=ev.target.value; persistSettings(); todayKey=null; syncDays(); weekCache=null; render(); });
   $("erase").addEventListener("click",function(){ confirmErase=true; render(); var b=$("confirmbox"); if(b) b.scrollIntoView({block:"nearest"}); });
@@ -443,25 +539,25 @@ function renderTrackers(m){
     $("erase-no").addEventListener("click",function(){ confirmErase=false; render(); });
     $("erase-yes").addEventListener("click",function(){ $("erase-yes").disabled=true; setSave("busy","Erasing…");
       Object.keys(subs).forEach(function(x){ try{subs[x]();}catch(e){} }); subs={}; days={}; todayKey=null;
-      store.erase().then(function(){ S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false}; setupStep=1; confirmErase=false; tab="today"; setSave("ok",savedLabel()); syncDays(); render(); toast("Everything erased",null); },
+      store.erase().then(function(){ S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:myTz()}; setupStep=1; confirmErase=false; tab="today"; setSave("ok",savedLabel()); syncDays(); render(); toast("Everything erased",null); },
         function(e){ onStoreError(e); confirmErase=false; syncDays(); render(); toast("Couldn't erase everything. Try again.",null); }); });
   }
 }
 
 /* ---------- first run ---------- */
-var setupStep=1;
+var setupStep=1, importedCount=0;
 function renderSetup(m){
   if(setupStep===1){
     head("Welcome","Let's set up your day");
-    m.innerHTML='<div class="intro"><h2>What do you want to keep track of?</h2><p>Pick up to '+MAX+'. Change anytime.</p></div>'+pickerHTML();
+    m.innerHTML='<div class="narrow"><div class="intro"><h2>What do you want to keep track of?</h2><p>Pick up to '+MAX+'. Change anytime.'+(importedCount?' Your Habitrak 2.0 trackers are already picked.':'')+'</p></div>'+pickerHTML()+'</div>';
     bindPicker(m,function(){});
     $("setupcount").textContent=S.sel.length+" of "+MAX+" picked";
     $("setupnext").textContent="Next";
   } else {
     head("Welcome","One more thing");
-    m.innerHTML='<div class="intro"><h2>When does your day start?</h2><p>Your day ribbon runs 24 hours from this time. Late nights before it count as the day before.</p></div>'+
+    m.innerHTML='<div class="narrow"><div class="intro"><h2>When does your day start?</h2><p>Your day ribbon runs 24 hours from this time. Late nights before it count as the day before.</p></div>'+
       '<div class="card"><div class="field"><span>Day starts at</span><input type="time" id="setup-start" value="'+esc(S.dayStart)+'" aria-label="Day starts at"></div></div>'+
-      '<p class="sub">Your log is saved '+(store.kind==="account"?"to your Claude account, and only you can see it.":"in this browser only.")+' No sign-up needed.</p>';
+      '<p class="sub">Your log is saved '+(store.kind==="account"?"to your Claude account, and only you can see it.":"in this browser only.")+' No sign-up needed.'+(importedCount?' Your '+importedCount+' entries from Habitrak 2.0 are already here.':'')+'</p></div>';
     $("setup-start").addEventListener("change",function(ev){ if(ev.target.value) S.dayStart=ev.target.value; });
     $("setupcount").textContent="";
     $("setupnext").textContent="Start tracking";
@@ -471,6 +567,22 @@ $("setupnext").addEventListener("click",function(){
   if(setupStep===1){ setupStep=2; render(); window.scrollTo(0,0); return; }
   S.setup=true; persistSettings(); todayKey=null; syncDays(); tab="today"; render(); toast("You're set. Tap a tile when something happens.",null);
 });
+
+/* ---------- one-time import from Habitrak 2.0 (staged by Claude in this artifact's private storage) ---------- */
+function runImport(imp){
+  var list=(imp.entries||[]).filter(function(e){return e&&CAT[e.tr]&&typeof e.t==="number";});
+  var byKey={};
+  list.forEach(function(e){ var k=dayKey(e.t); (byKey[k]=byKey[k]||{entries:[],checkin:null}).entries.push(e); });
+  (imp.checkins||[]).forEach(function(c){ if(!c||typeof c.wake!=="number") return; var k=dayKey(c.wake); (byKey[k]=byKey[k]||{entries:[],checkin:null}).checkin=c.checkin; });
+  var keys=Object.keys(byKey).sort(), n=0;
+  return keys.reduce(function(p,k){ return p.then(function(){ return store.getDay(k).then(function(day){
+      var have={}; day.entries.forEach(function(e){ have[e.id]=1; });
+      byKey[k].entries.forEach(function(e){ if(!have[e.id]){ day.entries.push(e); n++; } });
+      if(!day.checkin&&byKey[k].checkin) day.checkin=byKey[k].checkin;
+      day=normDay(day); if(days[k]) days[k]=day;
+      return store.saveDay(k,day); }); }); }, Promise.resolve())
+    .then(function(){ return store.markImported(n); }).then(function(){ return n; });
+}
 
 /* ---------- render ---------- */
 function render(){
@@ -492,12 +604,21 @@ setInterval(function(){
 /* ---------- boot ---------- */
 function boot(st){
   store=st; setSave("ok",savedLabel());
-  store.loadSettings().then(function(o){
-    S=o&&o.sel? {sel:o.sel.filter(function(t){return CAT[t];}).slice(0,MAX),goals:o.goals||{},dayStart:o.dayStart||"05:00",setup:!!o.setup} : {sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false};
+  Promise.all([store.loadSettings(), store.getImport().catch(function(){return null;})]).then(function(r){
+    var o=r[0], imp=r[1];
+    if(o&&o.sel) S={sel:o.sel.filter(function(t){return CAT[t];}).slice(0,MAX),goals:o.goals||{},dayStart:o.dayStart||"05:00",setup:!!o.setup,tz:o.tz||""};
+    else if(imp&&!imp.done) S={sel:(imp.sel||FIRST_RUN).filter(function(t){return CAT[t];}).slice(0,MAX),goals:imp.goals||{},dayStart:imp.dayStart||"05:00",setup:false,tz:""};
+    else S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:""};
     if(!S.sel.length) S.sel=FIRST_RUN.slice();
-    if(S.setup) syncDays();
-    render();
-  },function(e){ onStoreError(e); S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false}; render(); });
+    if(S.tz!==myTz()){ S.tz=myTz(); if(o) persistSettings(); }
+    var go=function(){ if(S.setup) syncDays(); render(); };
+    if(imp&&!imp.done){
+      setSave("busy","Bringing in Habitrak 2.0…");
+      runImport(imp).then(function(n){ importedCount=n; setSave("ok",savedLabel()); weekCache=null; go(); if(n&&S.setup) toast(n+" entries from Habitrak 2.0 are in your log",null); },
+        function(e){ onStoreError(e); go(); toast("Couldn't bring in Habitrak 2.0 yet. It will try again next time.",null); });
+      if(!S.setup) render();
+    } else go();
+  },function(e){ onStoreError(e); S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:myTz()}; render(); });
 }
 (function(){
   var c=window.claude;
