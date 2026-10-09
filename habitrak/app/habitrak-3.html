@@ -121,6 +121,18 @@ table.tot tr:last-child td{border-bottom:0}
 .confirm p{margin:0 0 10px}
 .confirm div{display:flex;gap:8px;flex-wrap:wrap}
 .loading{padding:40px 16px;color:var(--muted);text-align:center}
+button.weekrow{border:0;background:transparent;width:100%;text-align:left;cursor:pointer;padding:4px;margin:0 -4px 2px;border-radius:10px;color:var(--ink)}
+button.weekrow:hover{background:var(--hatch)}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.daynav .pill{min-height:40px;padding:0 14px}
+.daynav .pill:disabled{opacity:.4}
+.addopen{width:100%;margin-bottom:10px}
+.addcard h3{margin:0 0 10px;font-size:1rem}
+.addcard .chips{margin-bottom:10px}
+.addtimes{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.addtimes label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted);flex:1;min-width:120px}
+.addtimes input{border:1px solid var(--line);border-radius:10px;background:var(--bg);min-height:44px;padding:0 8px;width:100%}
+.addcard .row{display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .extras{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 14px}
 .xchip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:transparent;border-radius:12px;padding:0 12px 0 8px;min-height:44px;cursor:pointer;font-size:.88rem;color:var(--ink)}
@@ -285,7 +297,7 @@ function syncDays(){
   todayKey=k;
   var keep=[k,shift(k,-1)];
   Object.keys(subs).forEach(function(x){ if(keep.indexOf(x)<0){ try{subs[x]();}catch(e){} delete subs[x]; } });
-  keep.forEach(function(x){ if(!days[x]) days[x]=emptyDay(); watch(x); });
+  keep.forEach(function(x){ watch(x); });   // days[x] stays unset until its first snapshot, so nothing overwrites a day we haven't read
   return true;
 }
 
@@ -341,7 +353,12 @@ function toast(msg,undo){
   clearTimeout(toastTimer); toastTimer=setTimeout(function(){ $("toast").hidden=true; undoFn=null; },5000);
 }
 $("toastundo").addEventListener("click",function(){ if(undoFn) undoFn(); $("toast").hidden=true; undoFn=null; render(); });
-function addEntry(e){ var k=dayKey(e.t); if(!days[k]) days[k]=emptyDay(); days[k].entries.push(e); persistDay(k); return k; }
+function addEntry(e){
+  var k=dayKey(e.t);
+  if(days[k]){ days[k].entries.push(e); persistDay(k); return k; }
+  store.getDay(k).then(function(d){ if(!days[k]) days[k]=d; days[k].entries.push(e); persistDay(k); render(); },function(err){ onStoreError(err); });   // read the day first so its other entries are kept
+  return k;
+}
 function removeEntry(e){ var k=e._day||dayKey(e.t); if(!days[k]) return; days[k].entries=days[k].entries.filter(function(x){return x.id!==e.id;}); persistDay(k); }
 function tap(tr){
   syncDays();
@@ -400,14 +417,110 @@ function bindCheckin(m,s){
 function keepNote(){ var n=$("ci-note"); if(n) ci.note=n.value; }
 
 /* ---------- views ---------- */
-var tab="today", editing=null, confirmErase=false, weekCache=null;
+var tab="today", editing=null, confirmErase=false, weekCache=null, dayView=null;
 var NAV=[["today","Today",'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'],["week","Week",'<path d="M4 18h16M4 13h16M4 8h10"/>'],["goals","Goals",'<path d="M4 18h16"/><path d="M6 14l4-4 3 3 5-6"/>'],["trackers","Trackers",'<circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/>']];
 function renderNav(){
   $("navbtns").innerHTML=NAV.map(function(n){return '<button type="button" data-tab="'+n[0]+'"'+(tab===n[0]?' aria-current="page"':'')+'><i><svg viewBox="0 0 24 24" aria-hidden="true">'+n[2]+'</svg></i>'+n[1]+'</button>';}).join("");
 }
-$("navbtns").addEventListener("click",function(ev){ var b=ev.target.closest("[data-tab]"); if(!b) return; tab=b.dataset.tab; editing=null; confirmErase=false; if(tab==="week") weekCache=null; render(); window.scrollTo(0,0); });
+$("navbtns").addEventListener("click",function(ev){ var b=ev.target.closest("[data-tab]"); if(!b) return; tab=b.dataset.tab; editing=null; confirmErase=false; dayView=null; addOpen=false; if(tab==="week") weekCache=null; render(); window.scrollTo(0,0); });
 function head(t,s){ $("title").textContent=t; $("sub").textContent=s; }
 function label(e){ var c=CAT[e.tr]; if(e.as==="resisted") return "Resisted "+lower(e.tr); if(e.as==="given") return "Gave a "+lower(e.tr)+" away"; return c.n; }
+
+/* ---------- loading any day, and entries across loaded days ---------- */
+function ensureDays(keys){
+  if(!weekCache) weekCache={};
+  var live=[todayKey,shift(todayKey,-1)];
+  var need=keys.filter(function(k){return live.indexOf(k)<0&&!weekCache[k];});
+  if(!need.length) return null;
+  return Promise.all(need.map(function(k){return store.getDay(k);})).then(function(res){
+    need.forEach(function(k,i){ weekCache[k]=1; if(!writing[k]&&!dirty[k]) days[k]=res[i]; });
+  });
+}
+function entriesIn(keys){ var out=[]; keys.forEach(function(k){ ((days[k]||{}).entries||[]).forEach(function(e){ e._day=k; out.push(e); }); }); return out; }
+function find(id){ var r=null; Object.keys(days).forEach(function(k){ ((days[k]||{}).entries||[]).forEach(function(e){ if(e.id===id){ e._day=k; r=e; } }); }); return r; }
+function atTime(base,v){ if(!v) return null; var p=v.split(":"), d=new Date(base); d.setHours(+p[0],+p[1],0,0); return d.getTime(); }
+/* A clock time inside a day's window: times before the day start belong to the next calendar date. */
+function mapTime(k,v){ var p=k.split("-"), q=v.split(":"); var t=new Date(+p[0],+p[1]-1,+p[2],+q[0],+q[1]).getTime(); if(t<windowStart(k)) t=new Date(+p[0],+p[1]-1,+p[2]+1,+q[0],+q[1]).getTime(); return t; }
+/* An end time after a start: if the clock time is earlier, it's the next morning. */
+function endAfter(t,v){ var d=new Date(t), q=v.split(":"), i=0, e=new Date(d.getFullYear(),d.getMonth(),d.getDate(),+q[0],+q[1]).getTime(); while(e<=t&&i<2){ i++; e=new Date(d.getFullYear(),d.getMonth(),d.getDate()+i,+q[0],+q[1]).getTime(); } return e; }
+function dayTitle(k){ return k===todayKey? "Today" : k===shift(todayKey,-1)? "Yesterday" : new Date(windowStart(k)).toLocaleDateString([], {weekday:"long",month:"short",day:"numeric"}); }
+
+/* ---------- timeline shared by Today and the day view ---------- */
+function timelineHTML(list,emptyText){
+  var n=Date.now();
+  if(!list.length) return '<p class="empty">'+emptyText+'</p>';
+  return '<ul class="tl">'+list.map(function(e){
+    var c=CAT[e.tr], st=c.k==="s";
+    var what=st? c.n+" · "+(e.end==null? "now, "+dur(n-e.t) : dur(e.end-e.t)) : label(e);
+    var t=st? fmt(e.t).replace(/ ?[AP]M$/i,"")+"–"+(e.end==null?"now":fmt(e.end)) : fmt(e.t);
+    if(editing===e.id) return '<li class="editing"><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(label(e))+'</span>'+
+      '<label>'+(st?"Start":"Time")+'<input type="time" id="ed-start" value="'+hm(e.t)+'"></label>'+
+      (st&&e.end!=null?'<label>End<input type="time" id="ed-end" value="'+hm(e.end)+'"></label>':'')+
+      '<button type="button" data-save="'+e.id+'">Save</button><button type="button" class="del" data-del="'+e.id+'">Delete</button><button type="button" data-cancel>Cancel</button></li>';
+    return '<li><span class="t">'+t+'</span><span class="d" style="background:'+(done(e)?col(e.tr):'transparent')+';box-shadow:inset 0 0 0 2px '+col(e.tr)+'"></span><span class="w">'+esc(what)+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span><button type="button" data-edit="'+e.id+'" aria-label="Edit '+esc(label(e))+' at '+fmt(e.t)+'">Edit</button></li>';
+  }).join("")+'</ul>';
+}
+function bindTimeline(m){
+  m.querySelectorAll("[data-edit]").forEach(function(x){x.addEventListener("click",function(){ editing=x.dataset.edit; render(); var i=$("ed-start"); if(i) i.focus(); });});
+  m.querySelectorAll("[data-cancel]").forEach(function(x){x.addEventListener("click",function(){ editing=null; render(); });});
+  m.querySelectorAll("[data-del]").forEach(function(x){x.addEventListener("click",function(){
+    var e=find(x.dataset.del); if(!e) return; var k=e._day; removeEntry(e); editing=null;
+    toast(label(e)+" deleted",function(){ if(!days[k]) days[k]=emptyDay(); days[k].entries.push(e); persistDay(k); }); render(); });});
+  m.querySelectorAll("[data-save]").forEach(function(x){x.addEventListener("click",function(){
+    var e=find(x.dataset.save); if(!e) return;
+    var nt=atTime(e.t,$("ed-start").value), ne=e.end, endIn=$("ed-end");
+    if(endIn&&endIn.value) ne=endAfter(nt==null?e.t:nt,endIn.value);
+    if(nt==null||nt>Date.now()){ toast("Pick a start time before now",null); return; }
+    if(endIn&&(ne==null||ne>Date.now())){ toast("Pick an end time before now",null); return; }
+    var old={t:e.t,end:e.end}; e.t=nt; if(endIn) e.end=ne; persistDay(e._day); editing=null;
+    toast(label(e)+" updated",function(){ e.t=old.t; e.end=old.end; persistDay(e._day); }); render(); });});
+}
+
+/* ---------- add a missed entry (Today and any past day) ---------- */
+var addOpen=false, addTr=null, addAs="", addDraft={};
+function asOptions(tr){
+  if(CAT[tr].k!=="m") return [];
+  var g=S.goals[tr], o=[["","Logged"]];
+  if((g&&(g.cap||g.wait))||tr==="smoke"||tr==="drink") o.push(["resisted","Resisted"]);
+  if(tr==="smoke") o.push(["given","Gave away"]);
+  return o.length>1? o : [];
+}
+function addFormHTML(k){
+  if(!addOpen) return '<button type="button" class="pill tonal addopen" id="add-open">+ Add something you missed</button>';
+  if(!addTr||S.sel.indexOf(addTr)<0) addTr=S.sel.indexOf("sleep")>=0&&k!==todayKey? "sleep" : S.sel[0];
+  var c=CAT[addTr], st=c.k==="s", opts=asOptions(addTr);
+  var tv=addDraft.t||(addTr==="sleep"?"23:00":(k===todayKey?hm(Date.now()-30*MIN):"12:00"));
+  var ev=addDraft.e||(addTr==="sleep"?"07:00":"");
+  var h='<div class="card addcard"><h3>Add to '+esc(dayTitle(k).toLowerCase()==="today"?"today":dayTitle(k))+'</h3>';
+  h+='<div class="chips" role="group" aria-label="What to add">'+S.sel.map(function(t){return '<button type="button" class="chip" data-addtr="'+t+'" aria-pressed="'+(t===addTr)+'" style="--c:'+col(t)+'">'+svg(t)+esc(CAT[t].n)+'</button>';}).join("")+'</div>';
+  if(opts.length&&addAs&&!opts.some(function(o){return o[0]===addAs;})) addAs="";
+  if(opts.length) h+='<div class="chips" role="group" aria-label="Kind">'+opts.map(function(o){return '<button type="button" class="chip" style="--c:var(--brand)" data-addas="'+o[0]+'" aria-pressed="'+(o[0]===addAs)+'">'+o[1]+'</button>';}).join("")+'</div>';
+  h+='<div class="addtimes"><label>'+(st?"Start":"Time")+'<input type="time" id="add-t" value="'+tv+'"></label>'+(st?'<label>End<input type="time" id="add-e" value="'+ev+'"></label>':'')+'</div>';
+  h+='<p class="sub">'+(st?"An end earlier than the start means the next morning. ":"")+(k===todayKey?"A time later than now counts as last night.":"")+'</p>';
+  h+='<div class="row"><button type="button" class="pill" id="add-go">Add '+esc(c.n.toLowerCase())+'</button><button type="button" class="pill tonal" id="add-close">Done</button></div></div>';
+  return h;
+}
+function bindAdd(m,k){
+  var open=$("add-open"); if(open){ open.addEventListener("click",function(){ addOpen=true; addDraft={}; render(); var b=$("add-t"); if(b) b.scrollIntoView({block:"nearest"}); }); return; }
+  function keep(){ var a=$("add-t"), b=$("add-e"); addDraft={t:a&&a.value, e:b&&b.value}; }
+  m.querySelectorAll("[data-addtr]").forEach(function(b){b.addEventListener("click",function(){ addTr=b.dataset.addtr; addAs=""; addDraft={}; render(); });});
+  m.querySelectorAll("[data-addas]").forEach(function(b){b.addEventListener("click",function(){ keep(); addAs=b.dataset.addas; render(); });});
+  $("add-close").addEventListener("click",function(){ addOpen=false; addDraft={}; render(); });
+  $("add-go").addEventListener("click",function(){
+    var tr=addTr, c=CAT[tr], now=Date.now(), tv=$("add-t").value;
+    if(!tv){ toast("Pick a time",null); return; }
+    var t=mapTime(k,tv);
+    if(k===todayKey&&t>now) t-=DAY;
+    if(t>now){ toast("Pick a time before now",null); return; }
+    var e={id:newId(),tr:tr,t:t};
+    if(c.k==="s"){ var evv=$("add-e").value; if(!evv){ toast("Pick an end time",null); return; }
+      e.end=endAfter(t,evv); if(e.end>now){ toast("That end time hasn't happened yet",null); return; } }
+    else if(addAs) e.as=addAs;
+    addEntry(e); addDraft={};
+    toast(label(e)+" added · "+fmt(e.t)+(c.k==="s"?"–"+fmt(e.end):""),function(){ removeEntry(find(e.id)||e); });
+    render();
+  });
+}
 
 function renderToday(m){
   var n=Date.now(), r=running(), wake=wakeToCheck();
@@ -420,59 +533,50 @@ function renderToday(m){
   a+='<div class="card">'+ribbon(todayEntries(),windowStart(todayKey),{now:true,h:34,label:"Today so far"})+hourLabels()+'</div>';
   a+='<p class="lbl2">Tap to log</p><div class="tiles">'+S.sel.map(tileHTML).join("")+'</div>'+extrasHTML();
   var list=todayEntries().sort(function(x,y){return y.t-x.t;});
-  var b='<p class="lbl2">Timeline</p>';
-  if(!list.length) b+='<p class="empty">Nothing logged yet today. Tap a tile when something happens.</p>';
-  else b+='<ul class="tl">'+list.map(function(e){
-    var c=CAT[e.tr], st=c.k==="s";
-    var what=st? c.n+" · "+(e.end==null? "now, "+dur(n-e.t) : dur(e.end-e.t)) : label(e);
-    var t=st? fmt(e.t).replace(/ ?[AP]M$/i,"")+"–"+(e.end==null?"now":fmt(e.end)) : fmt(e.t);
-    if(editing===e.id) return '<li class="editing"><span class="d" style="background:'+col(e.tr)+'"></span><span class="w">'+esc(label(e))+'</span>'+
-      '<label>'+(st?"Start":"Time")+'<input type="time" id="ed-start" value="'+hm(e.t)+'"></label>'+
-      (st&&e.end!=null?'<label>End<input type="time" id="ed-end" value="'+hm(e.end)+'"></label>':'')+
-      '<button type="button" data-save="'+e.id+'">Save</button><button type="button" class="del" data-del="'+e.id+'">Delete</button><button type="button" data-cancel>Cancel</button></li>';
-    return '<li><span class="t">'+t+'</span><span class="d" style="background:'+(done(e)?col(e.tr):'transparent')+';box-shadow:inset 0 0 0 2px '+col(e.tr)+'"></span><span class="w">'+esc(what)+(e.note?'<span class="note">'+esc(e.note)+'</span>':'')+'</span><button type="button" data-edit="'+e.id+'" aria-label="Edit '+esc(label(e))+' at '+fmt(e.t)+'">Edit</button></li>';
-  }).join("")+'</ul>';
+  var b='<p class="lbl2">Timeline</p>'+addFormHTML(todayKey)+timelineHTML(list,"Nothing logged yet today. Tap a tile when something happens.");
   m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
   if(wake) bindCheckin(m,wake);
-  m.querySelectorAll("[data-edit]").forEach(function(x){x.addEventListener("click",function(){ editing=x.dataset.edit; render(); var i=$("ed-start"); if(i) i.focus(); });});
-  m.querySelectorAll("[data-cancel]").forEach(function(x){x.addEventListener("click",function(){ editing=null; render(); });});
-  m.querySelectorAll("[data-del]").forEach(function(x){x.addEventListener("click",function(){
-    var e=find(x.dataset.del); if(!e) return; var k=e._day; removeEntry(e); editing=null;
-    toast(label(e)+" deleted",function(){ if(!days[k]) days[k]=emptyDay(); days[k].entries.push(e); persistDay(k); }); render(); });});
-  m.querySelectorAll("[data-save]").forEach(function(x){x.addEventListener("click",function(){
-    var e=find(x.dataset.save); if(!e) return;
-    var nt=atTime(e.t,$("ed-start").value), ne=e.end, endIn=$("ed-end");
-    if(endIn) ne=atTime(e.end,endIn.value);
-    if(nt==null||nt>Date.now()){ toast("Pick a start time before now",null); return; }
-    if(endIn&&(ne==null||ne>Date.now())){ toast("Pick an end time before now",null); return; }
-    if(CAT[e.tr].k==="s"&&ne!=null&&ne<=nt){ toast("The end has to be after the start",null); return; }
-    var old={t:e.t,end:e.end}; e.t=nt; if(endIn) e.end=ne; persistDay(e._day); editing=null;
-    toast(label(e)+" updated",function(){ e.t=old.t; e.end=old.end; persistDay(e._day); }); render(); });});
+  bindAdd(m,todayKey); bindTimeline(m);
 }
-function find(id){ var r=null; liveEntries().forEach(function(e){ if(e.id===id) r=e; }); return r; }
-function atTime(base,v){ if(!v) return null; var p=v.split(":"), d=new Date(base); d.setHours(+p[0],+p[1],0,0); return d.getTime(); }
+
+function renderDay(m,k){
+  var keys=[shift(k,-1),k,shift(k,1)];
+  head(dayTitle(k), k===todayKey? "Fix entries or add one you missed" : new Date(windowStart(k)).toLocaleDateString([], {month:"long",day:"numeric"})+" · fix entries or add one you missed");
+  var p=ensureDays(keys);
+  if(p){ m.innerHTML='<p class="loading">Loading '+esc(dayTitle(k))+'…</p>'; p.then(function(){ if(tab==="week"&&dayView===k) render(); },function(e){ onStoreError(e); }); return; }
+  var st=windowStart(k), en=windowEnd(k);
+  var pool=entriesIn(keys), list=pool.filter(function(e){return overlaps(e,st,en);}).sort(function(x,y){return y.t-x.t;});
+  var nav='<div class="daynav"><button type="button" class="pill tonal" id="day-back">‹ Week</button><div><button type="button" class="pill tonal" id="day-prev" aria-label="Day before">‹</button> <button type="button" class="pill tonal" id="day-next" aria-label="Day after"'+(k===todayKey?' disabled':'')+'>›</button></div></div>';
+  var c=(days[k]||{}).checkin, ci='';
+  if(c&&c.feel) ci='<p class="sub">Morning check-in: felt '+c.feel+' of 5'+(c.sym&&c.sym.length?' · '+esc(c.sym.join(", ")):'')+(c.note?' · '+esc(c.note):'')+'</p>';
+  var a=nav+'<div class="card">'+ribbon(list,st,{now:k===todayKey,h:34,label:"Day ribbon"})+hourLabels()+'</div>'+ci;
+  var b='<p class="lbl2">Timeline</p>'+addFormHTML(k)+timelineHTML(list,"Nothing logged this day. Add anything you missed above.");
+  m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
+  $("day-back").addEventListener("click",function(){ dayView=null; editing=null; addOpen=false; render(); window.scrollTo(0,0); });
+  $("day-prev").addEventListener("click",function(){ dayView=shift(k,-1); editing=null; addOpen=false; render(); });
+  $("day-next").addEventListener("click",function(){ if(k!==todayKey){ dayView=shift(k,1); editing=null; addOpen=false; render(); } });
+  bindAdd(m,k); bindTimeline(m);
+}
 
 function renderWeek(m){
-  head("Week","Last 7 days · each row starts at "+fmt(windowStart(todayKey)));
+  if(dayView){ renderDay(m,dayView); return; }
+  head("Week","Last 7 days · tap a day to see or fix it");
   var keys=[]; for(var i=-8;i<=0;i++) keys.push(shift(todayKey,i));
-  var live=[todayKey,shift(todayKey,-1)];
-  if(!weekCache){
-    m.innerHTML='<p class="loading">Loading your week…</p>';
-    var past=keys.filter(function(k){return live.indexOf(k)<0;});
-    Promise.all(past.map(function(k){return store.getDay(k);})).then(function(res){ weekCache={}; past.forEach(function(k,i){ weekCache[k]=res[i]; }); if(tab==="week") render(); },function(e){ onStoreError(e); weekCache={}; if(tab==="week") render(); });
-    return;
-  }
-  function dayOf(k){ return (live.indexOf(k)>=0? days[k] : weekCache[k])||emptyDay(); }
-  var pool=[]; keys.forEach(function(k){ dayOf(k).entries.forEach(function(e){ pool.push(e); }); });
+  var p=ensureDays(keys);
+  if(p){ m.innerHTML='<p class="loading">Loading your week…</p>'; p.then(function(){ if(tab==="week") render(); },function(e){ onStoreError(e); weekCache={}; if(tab==="week") render(); }); return; }
+  function dayOf(k){ return days[k]||emptyDay(); }
+  var pool=entriesIn(keys);
   var a='<div class="card">', inWeek=[], logged=0, rows=keys.slice(2);
   for(var j=rows.length-1;j>=0;j--){ var k=rows[j], st=windowStart(k), en=windowEnd(k), dt=new Date(st);
     var shown=pool.filter(function(e){return overlaps(e,st,en);}), mine=pool.filter(function(e){return e.t>=st&&e.t<en;});
     if(mine.length) logged++; inWeek=inWeek.concat(mine);
-    a+='<div class="weekrow"><span><b>'+(k===todayKey?"Today":dt.toLocaleDateString([], {weekday:"short"}))+'</b>'+dt.getDate()+'</span>'+ribbon(shown,st,{h:20,now:k===todayKey,label:"Day ribbon"})+'</div>'; }
+    a+='<button type="button" class="weekrow" data-day="'+k+'" aria-label="Open '+esc(dayTitle(k))+'"><span><b>'+(k===todayKey?"Today":dt.toLocaleDateString([], {weekday:"short"}))+'</b>'+dt.getDate()+'</span>'+ribbon(shown,st,{h:20,now:k===todayKey,label:"Day ribbon"})+'</button>'; }
   a+=hourLabels(true)+'</div>';
-  if(!inWeek.length){ m.innerHTML='<div class="narrow">'+a+'<p class="empty">Your week fills in as you log. Each row is one day, dots are moments, bands are stretches.</p></div>'; return; }
+  var older='<button type="button" class="pill tonal" id="week-older" style="margin-bottom:12px">Earlier days</button>';
+  if(!inWeek.length){ m.innerHTML='<div class="narrow">'+a+older+'<p class="empty">Your week fills in as you log. Each row is one day, dots are moments, bands are stretches. Tap a day to add things you missed.</p></div>'; bindWeek(m); return; }
   var all=inWeek.filter(done), moments=S.sel.filter(function(t){return CAT[t].k==="m";}), top=null, best=0;
   moments.forEach(function(t){ var c=all.filter(function(e){return e.tr===t;}).length; if(c>best){best=c; top=t;} });
+  a+=older;
   if(top&&best>=5){ var hrs=new Array(24).fill(0); all.forEach(function(e){ if(e.tr===top) hrs[new Date(e.t).getHours()]++; }); var hi=hrs.indexOf(Math.max.apply(null,hrs));
     var lab=function(x){var h12=x%12||12; return h12+(x<12?" AM":" PM");};
     a+='<div class="obs"><b>'+esc(CAT[top].n)+'</b> happens most between '+lab(hi)+' and '+lab((hi+1)%24)+'.</div>'; }
@@ -488,13 +592,18 @@ function renderWeek(m){
       pool.forEach(function(e){ if(e.tr==="sleep"&&e.end!=null&&e.end>=st&&e.end<en&&e.end-e.t>=60*MIN&&(!s||e.end-e.t>s.end-s.t)) s=e; });
       if(s) nights.push({k:k,s:s,c:dayOf(k).checkin}); });
     b+='<p class="lbl2">Last 7 nights</p><div class="card">';
-    if(!nights.length) b+='<p class="empty">Tap Sleep when you go to bed and again when you wake up. Your nights show here.</p>';
+    if(!nights.length) b+='<p class="empty">Tap Sleep when you go to bed and again when you wake up, or add a night you missed from its day above.</p>';
     else b+='<table class="tot"><tr><td style="color:var(--muted);font-size:.78rem">Woke</td><td style="color:var(--muted);font-size:.78rem;text-align:left">Bed to wake</td><td style="color:var(--muted);font-size:.78rem">Felt</td></tr>'+nights.map(function(x){
       var w=new Date(x.s.end), c=x.c;
       return '<tr><td>'+w.toLocaleDateString([], {weekday:"short",day:"numeric"})+'</td><td style="text-align:left;font-weight:500">'+fmt(x.s.t)+'–'+fmt(x.s.end)+' · '+dur(x.s.end-x.s.t)+'</td><td>'+(c&&c.feel? c.feel+" of 5" : "–")+'</td></tr>'; }).join("")+'</table>';
     b+='</div>';
   }
   m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
+  bindWeek(m);
+}
+function bindWeek(m){
+  m.querySelectorAll("[data-day]").forEach(function(b){b.addEventListener("click",function(){ dayView=b.dataset.day; editing=null; addOpen=false; render(); window.scrollTo(0,0); });});
+  var o=$("week-older"); if(o) o.addEventListener("click",function(){ dayView=shift(todayKey,-7); editing=null; addOpen=false; render(); window.scrollTo(0,0); });
 }
 
 function renderGoals(m){
@@ -598,7 +707,7 @@ setInterval(function(){
   if(!S||!store||!S.setup) return;
   var rolled=syncDays();
   var a=document.activeElement, typing=a&&(a.tagName==="INPUT");
-  if((tab==="today"&&editing==null&&!typing)||rolled) render();
+  if((tab==="today"&&editing==null&&!addOpen&&!typing)||rolled) render();
 },30000);
 
 /* ---------- boot ---------- */

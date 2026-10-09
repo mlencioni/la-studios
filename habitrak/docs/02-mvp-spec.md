@@ -53,7 +53,7 @@ Only one stretch runs at a time. That keeps the model simple enough to explain i
 | Screen | Job | Content |
 |---|---|---|
 | **Today** | Log and look at today | Now card with Stop, day ribbon, all tiles in a 3×3 grid (up to 9 trackers), timeline newest first with Edit and Undo |
-| **Week** | See patterns | 7 day ribbons stacked, totals per tracker, one plain-language observation |
+| **Week** | See patterns, and fix any past day | 7 day ribbons stacked; tap a day to open it, edit or delete its entries, and add anything missed (moments with a time, stretches with start and end, overnight stretches like Sleep included); step back to earlier days. Totals per tracker, one plain-language observation |
 | **Goals** | Opt-in limits for any moment | Ceiling per day and minimum wait between (the 2.0 "gap"), framed as a ceiling, never a budget |
 | **Me** | Settings | Trackers, wake time, theme, export, delete account and data |
 
@@ -67,6 +67,7 @@ Onboarding is two screens: **pick what to track** (presets, up to 9, change anyt
 - 4×2 widget, 1×1 widget, Quick Settings tile, ongoing notification
 - Today, Week, Goals (ceiling and wait time), Me
 - Edit time on any entry; late logging with a time window (from 2.0)
+- **Fix any day, not just today** (added Oct 9, 2026 from Mark's use): "Add something you missed" on Today and on every past day. On Today, a time later than now counts as last night, so a forgotten night of Sleep can be added the next morning. An end earlier than the start means the next morning
 - Works fully offline; account optional at first launch, needed only for sync and backup
 - Light and dark themes, 48dp targets, TalkBack labels on every tile
 - Export to CSV; delete all data in-app (store requirement)

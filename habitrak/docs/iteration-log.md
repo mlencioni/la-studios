@@ -2,6 +2,12 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 9, 2026: Edit any day, add what you missed
+
+- **Found in Mark's use:** once a day ended, it couldn't be edited, and there was no way to add a forgotten entry. Mark couldn't log last night's sleep in the morning. Not in the requirements before; now it is (spec, MVP scope).
+- **Built in 3.0:** Week rows open that day. Each day shows its ribbon and timeline with Edit and Delete, plus "Add something you missed" (tracker, Logged/Resisted/Gave away where it applies, time, or start and end for stretches). Arrows step to the day before or after; "Earlier days" goes back further. Today has the same add form; a time later than now counts as last night.
+- **Bug fixed:** a tap made in the first moment after opening, before the day's saved entries arrived, could save over that day. The app now reads the day before writing to it. Reproduced with a slow stand-in store (3 entries lost before, 0 after).
+
 ## Oct 7, 2026: Habitrak 3.0 replaces 2.0
 
 - **Mark's call:** 3.0 becomes his daily tracker. 2.0 stays untouched as a read-only backup.
