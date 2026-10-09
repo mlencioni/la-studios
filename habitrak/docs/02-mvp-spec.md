@@ -53,7 +53,7 @@ Only one stretch runs at a time. That keeps the model simple enough to explain i
 | Screen | Job | Content |
 |---|---|---|
 | **Today** | Log and look at today | Now card with Stop, day ribbon, all tiles in a 3×3 grid (up to 9 trackers), timeline newest first with Edit and Undo |
-| **Week** | See patterns, and fix any past day | 7 day ribbons stacked; tap a day to open it, edit or delete its entries, and add anything missed (moments with a time, stretches with start and end, overnight stretches like Sleep included); step back to earlier days. Totals per tracker, one plain-language observation |
+| **Week** | See patterns, and fix any past day | 7 day ribbons stacked, each starting 8 hours before the day start (drawn lighter) so the night before is visible; tap a day to open it, edit or delete its entries, and add anything missed (moments with a time, stretches with start and end, overnight stretches like Sleep included); step back to earlier days. Totals per tracker, one plain-language observation |
 | **Goals** | Opt-in limits for any moment | Ceiling per day and minimum wait between (the 2.0 "gap"), framed as a ceiling, never a budget |
 | **Me** | Settings | Trackers, wake time, theme, export, delete account and data |
 

@@ -2,6 +2,11 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 9, 2026: Week bars include the night before
+
+- **Mark's ask:** with the day starting at 7 AM, last night's sleep sat at the end of the previous row. Each Week row and the day view now start 8 hours earlier (11 PM to 7 AM for a 7 AM start). The 8-hour lead-in is drawn lighter, with a divider and a bold label at the day start.
+- **Unchanged:** totals, averages and each day's timeline still count only the day itself, so nothing is counted twice. The Today bar still starts at the day start.
+
 ## Oct 9, 2026: Edit any day, add what you missed
 
 - **Found in Mark's use:** once a day ended, it couldn't be edited, and there was no way to add a forgotten entry. Mark couldn't log last night's sleep in the morning. Not in the requirements before; now it is (spec, MVP scope).

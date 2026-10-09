@@ -310,24 +310,31 @@ function countToday(tr,as){ var a=windowStart(todayKey); return liveEntries().fi
 function lastOf(tr){ var l=null; liveEntries().forEach(function(e){ if(e.tr===tr&&done(e)&&(!l||e.t>l.t)) l=e; }); return l; }
 
 /* ---------- ribbon ---------- */
+/* opts.lead (ms) adds time before the day start, drawn lighter, so last night shows at the start of a day's bar. */
 function ribbon(entries,start,opts){
-  opts=opts||{}; var W=240,H=opts.h||28,n=Date.now();
-  function x(t){return Math.max(0,Math.min(W,(t-start)/DAY*W));}
+  opts=opts||{}; var W=240,H=opts.h||28,n=Date.now(), lead=opts.lead||0, origin=start-lead, span=DAY+lead;
+  function x(t){return Math.max(0,Math.min(W,(t-origin)/span*W));}
   var s='<svg class="ribbon" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+(opts.label||"Day ribbon")+'">';
   s+='<rect x="0" y="'+(H*0.3)+'" width="'+W+'" height="'+(H*0.55)+'" rx="'+(H*0.2)+'" fill="var(--hatch)"/>';
   entries.forEach(function(e){ if(CAT[e.tr].k!=="s") return; var a=x(e.t), b=x(e.end==null?n:e.end); if(b-a<0.3) return;
     s+='<rect x="'+a.toFixed(2)+'" y="'+(H*0.3)+'" width="'+(b-a).toFixed(2)+'" height="'+(H*0.55)+'" rx="1.5" fill="'+col(e.tr)+'"/>'; });
   var r=(H>30?2.6:2.2);
-  entries.forEach(function(e){ if(CAT[e.tr].k!=="m"||e.t<start||e.t>start+DAY) return;
+  entries.forEach(function(e){ if(CAT[e.tr].k!=="m"||e.t<origin||e.t>start+DAY) return;
     s+= done(e)? '<circle cx="'+x(e.t).toFixed(2)+'" cy="'+(H*0.14+1)+'" r="'+r+'" fill="'+col(e.tr)+'"/>'
                : '<circle cx="'+x(e.t).toFixed(2)+'" cy="'+(H*0.14+1)+'" r="'+(r-0.5)+'" fill="none" stroke="'+col(e.tr)+'" stroke-width="1"/>'; });
+  if(lead){ var d=x(start);
+    s+='<rect x="0" y="'+(H*0.3)+'" width="'+d.toFixed(2)+'" height="'+(H*0.55)+'" fill="var(--bg)" opacity=".45"/>';
+    s+='<rect x="'+(d-0.5).toFixed(2)+'" y="'+(H*0.2)+'" width="1" height="'+(H*0.75)+'" fill="var(--muted)"/>'; }
   if(opts.now){ var a=x(n); s+='<rect x="'+(a-0.6).toFixed(2)+'" y="'+(H*0.22)+'" width="1.2" height="'+(H*0.72)+'" fill="var(--ink)"/>'; }
   return s+'</svg>';
 }
-function hourLabels(indent){
-  var h=startHM()[0], out=[]; for(var i=0;i<=4;i++){ var x=(h+6*i)%24, h12=x%12||12; out.push('<span>'+h12+(x<12?"a":"p")+'</span>'); }
+/* Labels at quarter marks of the bar; with a lead, the day start sits at the first quarter for an 8-hour lead. */
+function hourLabels(indent,leadH){
+  leadH=leadH||0; var h=startHM()[0]-leadH, step=(24+leadH)/4, out=[];
+  for(var i=0;i<=4;i++){ var x=((Math.round(h+step*i)%24)+24)%24, h12=x%12||12; out.push('<span'+(leadH&&i===1?' style="color:var(--ink);font-weight:700"':'')+'>'+h12+(x<12?"a":"p")+'</span>'); }
   return '<div class="hours" aria-hidden="true"'+(indent?' style="margin-left:52px"':'')+'>'+out.join("")+'</div>';
 }
+var LEAD_H=8, LEAD=LEAD_H*3600000;
 
 /* ---------- tiles ---------- */
 function tileHTML(tr){
@@ -549,7 +556,8 @@ function renderDay(m,k){
   var nav='<div class="daynav"><button type="button" class="pill tonal" id="day-back">‹ Week</button><div><button type="button" class="pill tonal" id="day-prev" aria-label="Day before">‹</button> <button type="button" class="pill tonal" id="day-next" aria-label="Day after"'+(k===todayKey?' disabled':'')+'>›</button></div></div>';
   var c=(days[k]||{}).checkin, ci='';
   if(c&&c.feel) ci='<p class="sub">Morning check-in: felt '+c.feel+' of 5'+(c.sym&&c.sym.length?' · '+esc(c.sym.join(", ")):'')+(c.note?' · '+esc(c.note):'')+'</p>';
-  var a=nav+'<div class="card">'+ribbon(list,st,{now:k===todayKey,h:34,label:"Day ribbon"})+hourLabels()+'</div>'+ci;
+  var withNight=pool.filter(function(e){return overlaps(e,st-LEAD,en);});
+  var a=nav+'<div class="card">'+ribbon(withNight,st,{now:k===todayKey,h:34,lead:LEAD,label:"Day ribbon, starting the evening before"})+hourLabels(false,LEAD_H)+'<p class="sub" style="margin:6px 0 0">The lighter part is the '+LEAD_H+' hours before your day starts.</p></div>'+ci;
   var b='<p class="lbl2">Timeline</p>'+addFormHTML(k)+timelineHTML(list,"Nothing logged this day. Add anything you missed above.");
   m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
   $("day-back").addEventListener("click",function(){ dayView=null; editing=null; addOpen=false; render(); window.scrollTo(0,0); });
@@ -568,10 +576,10 @@ function renderWeek(m){
   var pool=entriesIn(keys);
   var a='<div class="card">', inWeek=[], logged=0, rows=keys.slice(2);
   for(var j=rows.length-1;j>=0;j--){ var k=rows[j], st=windowStart(k), en=windowEnd(k), dt=new Date(st);
-    var shown=pool.filter(function(e){return overlaps(e,st,en);}), mine=pool.filter(function(e){return e.t>=st&&e.t<en;});
+    var shown=pool.filter(function(e){return overlaps(e,st-LEAD,en);}), mine=pool.filter(function(e){return e.t>=st&&e.t<en;});
     if(mine.length) logged++; inWeek=inWeek.concat(mine);
-    a+='<button type="button" class="weekrow" data-day="'+k+'" aria-label="Open '+esc(dayTitle(k))+'"><span><b>'+(k===todayKey?"Today":dt.toLocaleDateString([], {weekday:"short"}))+'</b>'+dt.getDate()+'</span>'+ribbon(shown,st,{h:20,now:k===todayKey,label:"Day ribbon"})+'</button>'; }
-  a+=hourLabels(true)+'</div>';
+    a+='<button type="button" class="weekrow" data-day="'+k+'" aria-label="Open '+esc(dayTitle(k))+'"><span><b>'+(k===todayKey?"Today":dt.toLocaleDateString([], {weekday:"short"}))+'</b>'+dt.getDate()+'</span>'+ribbon(shown,st,{h:20,now:k===todayKey,lead:LEAD,label:"Day ribbon, starting the evening before"})+'</button>'; }
+  a+=hourLabels(true,LEAD_H)+'<p class="sub" style="margin:6px 0 0 52px">Each row starts '+LEAD_H+' hours before your day, so last night shows first.</p></div>';
   var older='<button type="button" class="pill tonal" id="week-older" style="margin-bottom:12px">Earlier days</button>';
   if(!inWeek.length){ m.innerHTML='<div class="narrow">'+a+older+'<p class="empty">Your week fills in as you log. Each row is one day, dots are moments, bands are stretches. Tap a day to add things you missed.</p></div>'; bindWeek(m); return; }
   var all=inWeek.filter(done), moments=S.sel.filter(function(t){return CAT[t].k==="m";}), top=null, best=0;
