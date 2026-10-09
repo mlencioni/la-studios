@@ -28,6 +28,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
 | `end` | Stretches only: end time in ms, or `null` while running |
 | `as` | Optional: `"resisted"` (skipped one) or `"given"` (gave a smoke away). These don't count as smoked or drunk |
 | `note` | Optional, Mark's own words |
+| `med` | Meds only: the medication's `id` from `profile.meds` (each has `id`, `name`, `dose`, `times`). "Took my Metformin" logs `{tr:"meds", med:<its id>}`; a skipped dose adds `as:"skipped"` |
 
 ## Steps
 
@@ -37,6 +38,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
 4. Change the entries:
    - **Moment** ("log a smoke"): append `{id, tr, t}`.
    - **Resisted / gave one away:** append `{id, tr, t, as}`.
+   - **Medication** ("took my Metformin"): match the name in `profile.meds` and append `{id, tr:"meds", med, t}`. If no name matches, log plain `{id, tr:"meds", t}` and say so.
    - **Start a stretch** ("going to bed", "starting work"): first stop any running stretch (an entry with `end: null` in today's or yesterday's document) by setting its `end` to now. Then append `{id, tr, t, end: null}`.
    - **Stop a stretch** ("I'm up", "done with work"): set `end` on the running entry with that `tr`.
    - **"Finished my smoke/drink":** Habitrak 3.0 logs moments only, so there's nothing to change. Say so in a few words.

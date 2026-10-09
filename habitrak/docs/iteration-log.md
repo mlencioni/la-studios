@@ -2,6 +2,14 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 9, 2026: Trends tab, medications and reminders
+
+- **Trends (new tab):** 7, 30, 90 days or All. Each tracker gets its average a day (sleep: a night), the change against the previous period of the same length, resisted and given-away rates for moments, and a daily bar chart with the average as a dashed line. Tap a bar for that day's number. Averages count only days with something logged; sleep averages only nights with sleep logged. Ranges over 120 days show weekly bars.
+- **Medications:** add each one in Trackers (name, dose, due times; none means as needed). Saving the first one adds the Meds tile if there's room. The Meds tile asks which one. A dose counts as taken by a Meds entry from 2 hours before it until 2 hours before the next dose.
+- **Reminder banner on Today:** shows for a dose that's due and not logged, with Took it now, Took it at the due time, Skip, and In 30 min. When nothing is due, a line shows the next dose. Trends shows doses taken out of doses due for each medication.
+- **Limit:** reminders only show while Habitrak is open. Real phone notifications need the Android build (already in the release path).
+- **Voice logging:** instructions updated so "took my Metformin" logs against the right medication.
+
 ## Oct 9, 2026: Week bars include the night before
 
 - **Mark's ask:** with the day starting at 7 AM, last night's sleep sat at the end of the previous row. Each Week row and the day view now start 8 hours earlier (11 PM to 7 AM for a 7 AM start). The 8-hour lead-in is drawn lighter, with a divider and a bold label at the day start.

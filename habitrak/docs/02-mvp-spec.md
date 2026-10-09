@@ -54,6 +54,7 @@ Only one stretch runs at a time. That keeps the model simple enough to explain i
 |---|---|---|
 | **Today** | Log and look at today | Now card with Stop, day ribbon, all tiles in a 3×3 grid (up to 9 trackers), timeline newest first with Edit and Undo |
 | **Week** | See patterns, and fix any past day | 7 day ribbons stacked, each starting 8 hours before the day start (drawn lighter) so the night before is visible; tap a day to open it, edit or delete its entries, and add anything missed (moments with a time, stretches with start and end, overnight stretches like Sleep included); step back to earlier days. Totals per tracker, one plain-language observation |
+| **Trends** | See averages over time | Range 7, 30, 90 days or All. One card per tracker: average a day (sleep: a night), change against the previous period of the same length, resisted and given-away rates, and a daily bar chart with the average marked; tap a bar for its value. Medication doses taken out of doses due. Averages count only days with something logged |
 | **Goals** | Opt-in limits for any moment | Ceiling per day and minimum wait between (the 2.0 "gap"), framed as a ceiling, never a budget |
 | **Me** | Settings | Trackers, wake time, theme, export, delete account and data |
 
@@ -67,6 +68,7 @@ Onboarding is two screens: **pick what to track** (presets, up to 9, change anyt
 - 4×2 widget, 1×1 widget, Quick Settings tile, ongoing notification
 - Today, Week, Goals (ceiling and wait time), Me
 - Edit time on any entry; late logging with a time window (from 2.0)
+- **Medications** (added Oct 9, 2026): a list in Trackers with name, dose and due times. Today shows a reminder banner for any dose that is due and not logged: Took it now, Took it at the due time, Skip, or remind in 30 minutes. The Meds tile asks which medication. Reminders show only while the app is open; phone notifications come with the Android build
 - **Fix any day, not just today** (added Oct 9, 2026 from Mark's use): "Add something you missed" on Today and on every past day. On Today, a time later than now counts as last night, so a forgotten night of Sleep can be added the next morning. An end earlier than the start means the next morning
 - Works fully offline; account optional at first launch, needed only for sync and backup
 - Light and dark themes, 48dp targets, TalkBack labels on every tile
