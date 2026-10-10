@@ -23,7 +23,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
 | Field | Meaning |
 |---|---|
 | `id` | Unique string. Use `v` + the current time in base 36 + 3 random letters |
-| `tr` | Tracker: moments `coffee` `water` `meal` `snack` `smoke` `drink` `meds`; stretches `work` `walk` `commute` `rest` `screen` `sleep` `stretch` `workout` |
+| `tr` | Tracker: moments `coffee` `water` `meal` `snack` `smoke` `drink` `meds`; stretches `work` `chores` `walk` `commute` `rest` `screen` `sleep` `stretch` `workout` |
 | `t` | Start time, epoch milliseconds |
 | `end` | Stretches only: end time in ms, or `null` while running |
 | `as` | Optional: `"resisted"` (skipped one) or `"given"` (gave a smoke away). These don't count as smoked or drunk |

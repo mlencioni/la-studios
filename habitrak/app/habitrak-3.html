@@ -8,7 +8,7 @@
   --bg:#F8FAF8; --ink:#17201E; --muted:#58645F; --line:#CCD5D1;
   --brand:#1C6A61; --on-brand:#FFFFFF; --brand-soft:#D3E7E2; --tile:#EEF3F1; --hatch:#00000010; --bad:#B23A3A;
   --t-work:#3E63A8; --t-walk:#2F8A5B; --t-commute:#6B7480; --t-rest:#8A6BC1; --t-screen:#B5507A; --t-sleep:#33407A;
-  --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B; --t-stretch:#2E8C7E; --t-workout:#C0512F;
+  --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B; --t-stretch:#2E8C7E; --t-workout:#C0512F; --t-chores:#8C6D1F;
   --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
   --f-body:"Roboto Flex",Roboto,"Segoe UI",system-ui,sans-serif;
 }
@@ -16,13 +16,13 @@
   --bg:#141A19; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
   --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --hatch:#FFFFFF0D; --bad:#F08A80;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
-  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A;
+  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141A19; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
   --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --hatch:#FFFFFF0D; --bad:#F08A80;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
-  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A;
+  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C;
   color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -217,12 +217,13 @@ var IC={
   screen:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
   sleep:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
   stretch:'<circle cx="12" cy="4.5" r="1.8"/><path d="M4.5 6.5L12 9l7.5-2.5M12 9v5M12 14l-3.5 7M12 14l3.5 7"/>',
-  workout:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>'
+  workout:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>',
+  chores:'<path d="M15 3l-5 9M8 12h6l2 9H6z"/><path d="M9 16v5M12 16v5"/>'
 };
 var CAT={
   coffee:{n:"Coffee",k:"m"}, water:{n:"Water",k:"m"}, meal:{n:"Meal",k:"m"}, snack:{n:"Snack",k:"m"},
   smoke:{n:"Smoke",k:"m"}, drink:{n:"Drink",k:"m"}, meds:{n:"Meds",k:"m"},
-  work:{n:"Work",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}, stretch:{n:"Stretch",k:"s"}, workout:{n:"Workout",k:"s"}
+  work:{n:"Work",k:"s"}, chores:{n:"Chores",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}, stretch:{n:"Stretch",k:"s"}, workout:{n:"Workout",k:"s"}
 };
 var SYMPTOMS=[["tired","Tired"],["foggy","Foggy"],["headache","Headache"],["nausea","Nausea"],["anxious","Anxious"],["shaky","Shaky"],["sweaty","Sweaty"],["fine","Fine"]];
 var MAX=9, FIRST_RUN=["coffee","work","water","walk","meal"];
@@ -417,6 +418,17 @@ function tapExtra(tr,as){
   toast((as==="given"?"Gave a "+lower(tr)+" away":"Resisted "+lower(tr))+" · "+fmt(e.t),function(){ removeEntry(e); });
   render();
 }
+/* Enter saves and Escape cancels in every form: timeline edit, add a missed entry, medication form, morning note. */
+document.addEventListener("keydown",function(ev){
+  if(ev.key!=="Enter"&&ev.key!=="Escape") return;
+  var el=ev.target; if(!el||el.tagName!=="INPUT") return;
+  function press(sel,scope){ var b=(scope||document).querySelector(sel); if(b&&!b.disabled){ ev.preventDefault(); b.click(); return true; } return false; }
+  var row=el.closest("li.editing");
+  if(row){ if(ev.key==="Enter") press("[data-save]",row); else press("[data-cancel]",row); return; }
+  if(el.closest(".addcard")){ if(ev.key==="Enter") press("#add-go"); else press("#add-close"); return; }
+  if(el.closest(".medform")){ if(ev.key==="Escape") press("#mf-cancel"); else if(el.id==="mf-time") press("#mf-addtime"); else press("#mf-save"); return; }
+  if(el.id==="ci-note"&&ev.key==="Enter") press("#ci-save");
+});
 document.addEventListener("click",function(ev){
   var b=ev.target.closest(".tile[data-tr]"); if(b){ tap(b.dataset.tr); return; }
   var x=ev.target.closest("[data-x]"); if(x){ tapExtra(x.dataset.x,x.dataset.as); return; }

@@ -2,6 +2,11 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 10, 2026: Enter saves; Chores tracker
+
+- **Enter key (Mark's ask):** Enter now saves in the timeline edit row, "Add something you missed", the medication form (Enter in the time box adds the time) and the morning check-in note. Escape cancels an edit or closes the form.
+- **Chores (Mark's ask):** a new stretch, like Work: tap to start, Stop or another stretch ends it. Shows in Trends as time a day.
+
 ## Oct 9, 2026: Trends tab, medications and reminders
 
 - **Trends (new tab):** 7, 30, 90 days or All. Each tracker gets its average a day (sleep: a night), the change against the previous period of the same length, resisted and given-away rates for moments, and a daily bar chart with the average as a dashed line. Tap a bar for that day's number. Averages count only days with something logged; sleep averages only nights with sleep logged. Ranges over 120 days show weekly bars.
