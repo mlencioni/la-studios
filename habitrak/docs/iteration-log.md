@@ -2,6 +2,17 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 13, 2026: Medication schedule for an elderly patient
+
+- **Mark's requirement:** design for someone taking about 20 pills a day, in the morning, at noon and at night.
+- **Settings (Trackers):** Morning, Noon and Night dose times; the on-time window (±15, 30 or 60 min); a medication list where each one has a strength, pills each time, and its dose times. A summary shows the pill count per dose time. Medications saved under the earlier per-pill times move to the nearest of Morning, Noon or Night.
+- **Today:** a Medications card with one large button per dose time, its pill count and status (due, ✓ taken at what time and how early or late, skipped, or upcoming). A reminder banner appears when a dose time arrives, with "I took them", "Took them at <due time>", "Remind me in 30 min" and "Skip". One tap logs the whole dose. "See morning pills" lists each pill; within a taken dose, a single pill can be switched to Missed.
+- **Log:** each dose entry says how early or late it was ("Morning pills (10) · on time", "Noon pills (4) · 1h 2m late", "· 1 missed"). Editing the time recalculates it.
+- **Trends:** "Medications on time" shows, for each dose time, doses taken out of doses due, how many were on time, and the usual lateness.
+- **Voice logging:** "I took my morning pills" logs the morning dose with its timing.
+- **Tested:** 13 medications, 20 pills a day, two weeks of history, at iPad and S5 sizes. Fixed during testing: cut-off timeline text on the S5, and an unclear Missed toggle.
+- **Open question for Mark:** what swipe he expected on the iPad (the app has no swipe gestures yet).
+
 ## Oct 10, 2026: Enter saves; Chores tracker
 
 - **Enter key (Mark's ask):** Enter now saves in the timeline edit row, "Add something you missed", the medication form (Enter in the time box adds the time) and the morning check-in note. Escape cancels an edit or closes the form.

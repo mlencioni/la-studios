@@ -28,6 +28,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
 | `end` | Stretches only: end time in ms, or `null` while running |
 | `as` | Optional: `"resisted"` (skipped one) or `"given"` (gave a smoke away). These don't count as smoked or drunk |
 | `note` | Optional, Mark's own words |
+| `slot` | Meds only, for a scheduled dose: `"am"` (morning), `"noon"` or `"pm"` (night). Comes with `due` (the dose time that day, in ms, from `profile.medTimes`, default 08:00, 12:00, 20:00) and `pills` (how many pills that dose is: the sum of `count` for every medication in `profile.meds` whose `slots` include it) |
 | `med` | Meds only: the medication's `id` from `profile.meds` (each has `id`, `name`, `dose`, `times`). "Took my Metformin" logs `{tr:"meds", med:<its id>}`; a skipped dose adds `as:"skipped"` |
 
 ## Steps
@@ -38,6 +39,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
 4. Change the entries:
    - **Moment** ("log a smoke"): append `{id, tr, t}`.
    - **Resisted / gave one away:** append `{id, tr, t, as}`.
+   - **Scheduled pills** ("I took my morning pills", "took my night meds", or "I took them" right after a reminder): append `{id, tr:"meds", slot, t, due, pills}`. Skipped: add `as:"skipped"`. Reply with how early or late it was against `due`: within `profile.onTimeMin` minutes (default 30) is "on time"; otherwise say "25 min late" or "10 min early".
    - **Medication** ("took my Metformin"): match the name in `profile.meds` and append `{id, tr:"meds", med, t}`. If no name matches, log plain `{id, tr:"meds", t}` and say so.
    - **Start a stretch** ("going to bed", "starting work"): first stop any running stretch (an entry with `end: null` in today's or yesterday's document) by setting its `end` to now. Then append `{id, tr, t, end: null}`.
    - **Stop a stretch** ("I'm up", "done with work"): set `end` on the running entry with that `tr`.

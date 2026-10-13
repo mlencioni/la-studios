@@ -6,7 +6,7 @@
 /* Layout: one phone-width column, app bar on top, tiles and timeline in the middle, nav pinned to the bottom. */
 :root{
   --bg:#F8FAF8; --ink:#17201E; --muted:#58645F; --line:#CCD5D1;
-  --brand:#1C6A61; --on-brand:#FFFFFF; --brand-soft:#D3E7E2; --tile:#EEF3F1; --hatch:#00000010; --bad:#B23A3A;
+  --brand:#1C6A61; --on-brand:#FFFFFF; --brand-soft:#D3E7E2; --tile:#EEF3F1; --good:#2F7A4F; --warn:#8A5D00; --hatch:#00000010; --bad:#B23A3A;
   --t-work:#3E63A8; --t-walk:#2F8A5B; --t-commute:#6B7480; --t-rest:#8A6BC1; --t-screen:#B5507A; --t-sleep:#33407A;
   --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B; --t-stretch:#2E8C7E; --t-workout:#C0512F; --t-chores:#8C6D1F;
   --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
@@ -14,13 +14,13 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#141A19; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
-  --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --hatch:#FFFFFF0D; --bad:#F08A80;
+  --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --good:#7CC39A; --warn:#E3C15A; --hatch:#FFFFFF0D; --bad:#F08A80;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
   --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141A19; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
-  --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --hatch:#FFFFFF0D; --bad:#F08A80;
+  --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --good:#7CC39A; --warn:#E3C15A; --hatch:#FFFFFF0D; --bad:#F08A80;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
   --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C;
   color-scheme:dark}
@@ -67,7 +67,7 @@ main{flex:1;padding:4px 16px calc(96px + env(safe-area-inset-bottom,0px))}
 .tl li:last-child{border-bottom:0}
 .tl .t{color:var(--muted);min-width:72px;font-size:.82rem}
 .tl .d{width:10px;height:10px;border-radius:50%;flex:none}
-.tl .w{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl .w{flex:1;min-width:0;overflow-wrap:anywhere}
 .tl button{border:0;background:transparent;color:var(--brand);font-weight:500;min-height:40px;padding:0 6px;cursor:pointer}
 .tl button.del{color:var(--bad)}
 .tl li.editing .w{flex-basis:calc(100% - 20px)}
@@ -122,7 +122,24 @@ table.tot tr:last-child td{border-bottom:0}
 .confirm div{display:flex;gap:8px;flex-wrap:wrap}
 .loading{padding:40px 16px;color:var(--muted);text-align:center}
 .medbanner{border:2px solid var(--brand);background:var(--brand-soft)}
-.medbanner p{margin:0 0 10px}
+.medbanner p{margin:0 0 10px;font-size:1.05rem}
+.pill.big{min-height:52px;font-size:1.05rem;padding:0 20px}
+.slotgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.slot{border:1px solid var(--line);background:var(--bg);border-radius:16px;min-height:104px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--ink);text-align:center}
+.slot b{font-size:1.05rem}
+.slot small{color:var(--muted);font-size:.78rem;line-height:1.2}
+.slot span{font-size:.8rem;font-weight:700;line-height:1.2}
+.slot-due{border:2px solid var(--brand);background:var(--brand-soft)}
+.slot-taken{background:var(--tile)}
+.ok{color:var(--good)} .late{color:var(--warn)}
+.pilllist{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.pilllist p{margin:0 0 4px}
+.pilllist ul{list-style:none;margin:0;padding:0}
+.pilllist li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;font-size:.92rem}
+.pilllist .pill{min-height:40px;padding:0 12px;font-size:.85rem;flex:none}
+.pilllist .missbtn{background:transparent;color:var(--warn);box-shadow:inset 0 0 0 2px var(--warn)}
+.medcard .row{display:flex;flex-wrap:wrap;gap:4px 12px}
+.linkish{border:0;background:transparent;color:var(--brand);text-decoration:underline;min-height:40px;cursor:pointer;padding:0;font-size:.88rem}
 .medbanner .pill.tonal{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
 .medbanner .row,.medform .row{display:flex;flex-wrap:wrap;gap:8px}
 .medbanner .pill,.medform .pill,.medbtns .pill{min-height:40px;padding:0 14px}
@@ -248,7 +265,7 @@ function dayKey(t){var d=new Date(t),h=startHM(),s=new Date(d.getFullYear(),d.ge
 function shift(key,n){var p=key.split("-");return keyOf(new Date(+p[0],+p[1]-1,+p[2]+n));}
 function windowEnd(key){return windowStart(shift(key,1));}
 function emptyDay(){return {entries:[],checkin:null};}
-function normDay(o){ o=o||{}; return {entries:(o.entries||[]).filter(function(e){return e&&CAT[e.tr]&&typeof e.t==="number";}).map(function(e){var x={id:e.id,tr:e.tr,t:e.t}; if(CAT[e.tr].k==="s") x.end=e.end==null?null:e.end; if(e.as) x.as=e.as; if(e.note) x.note=e.note; if(e.src) x.src=e.src; if(e.med) x.med=String(e.med).slice(0,40); return x;}), checkin:o.checkin||null}; }
+function normDay(o){ o=o||{}; return {entries:(o.entries||[]).filter(function(e){return e&&CAT[e.tr]&&typeof e.t==="number";}).map(function(e){var x={id:e.id,tr:e.tr,t:e.t}; if(CAT[e.tr].k==="s") x.end=e.end==null?null:e.end; if(e.as) x.as=e.as; if(e.note) x.note=e.note; if(e.src) x.src=e.src; if(e.med) x.med=String(e.med).slice(0,40); if(e.slot) x.slot=e.slot; if(e.due) x.due=e.due; if(e.pills) x.pills=e.pills; if(e.missed&&e.missed.length) x.missed=e.missed.slice(0,40); return x;}), checkin:o.checkin||null}; }
 
 /* ---------- storage: private per-person db, or this browser ---------- */
 var store=null, days={}, writing={}, dirty={}, saveState="ok";
@@ -305,7 +322,7 @@ function persistSettings(){
   (function loop(){
     if(!settingsDirty){ settingsBusy=false; return; }
     settingsDirty=false;
-    store.saveSettings({sel:S.sel,goals:S.goals,dayStart:S.dayStart,setup:!!S.setup,tz:S.tz||myTz(),meds:S.meds||[]}).then(loop,function(err){onStoreError(err); settingsBusy=false;});
+    store.saveSettings({sel:S.sel,goals:S.goals,dayStart:S.dayStart,setup:!!S.setup,tz:S.tz||myTz(),meds:S.meds||[],medTimes:S.medTimes||{},onTimeMin:S.onTimeMin||30}).then(loop,function(err){onStoreError(err); settingsBusy=false;});
   })();
 }
 
@@ -396,7 +413,7 @@ function addEntry(e){
 function removeEntry(e){ var k=e._day||dayKey(e.t); if(!days[k]) return; days[k].entries=days[k].entries.filter(function(x){return x.id!==e.id;}); persistDay(k); }
 function tap(tr){
   syncDays();
-  if(tr==="meds"&&(S.meds||[]).length){ if(S.meds.length>1){ medPick=!medPick; render(); return; } var e1={id:newId(),tr:"meds",med:S.meds[0].id,t:Date.now()}; addEntry(e1); toast(label(e1)+" logged · "+fmt(e1.t),function(){ removeEntry(find(e1.id)||e1); }); render(); return; }
+  if(tr==="meds"&&(S.meds||[]).length){ medPick=!medPick; render(); return; }
   var c=CAT[tr], t=Date.now();
   if(c.k==="m"){
     var e={id:newId(),tr:tr,t:t}; addEntry(e);
@@ -426,7 +443,7 @@ document.addEventListener("keydown",function(ev){
   var row=el.closest("li.editing");
   if(row){ if(ev.key==="Enter") press("[data-save]",row); else press("[data-cancel]",row); return; }
   if(el.closest(".addcard")){ if(ev.key==="Enter") press("#add-go"); else press("#add-close"); return; }
-  if(el.closest(".medform")){ if(ev.key==="Escape") press("#mf-cancel"); else if(el.id==="mf-time") press("#mf-addtime"); else press("#mf-save"); return; }
+  if(el.closest(".medform")){ if(ev.key==="Escape") press("#mf-cancel"); else press("#mf-save"); return; }
   if(el.id==="ci-note"&&ev.key==="Enter") press("#ci-save");
 });
 document.addEventListener("click",function(ev){
@@ -462,61 +479,93 @@ function bindCheckin(m,s){
 }
 function keepNote(){ var n=$("ci-note"); if(n) ci.note=n.value; }
 
-/* ---------- medications: list, due doses, reminders ---------- */
-var medPick=false, medForm=null;
+/* ---------- medications: pill list, morning/noon/night doses, reminders, on-time tracking ---------- */
+var SLOTS=[["am","Morning"],["noon","Noon"],["pm","Night"]], SLOT_DEF={am:"08:00",noon:"12:00",pm:"20:00"};
+var medPick=false, medForm=null, showPills={};
+function slotName(s){ var r=s; SLOTS.forEach(function(x){ if(x[0]===s) r=x[1]; }); return r; }
 function medById(id){ var r=null; (S.meds||[]).forEach(function(m){ if(m.id===id) r=m; }); return r; }
 function medName(m){ return m.name+(m.dose?" "+m.dose:""); }
 function fmtHM(v){ var p=v.split(":"), h=+p[0], h12=h%12||12; return h12+":"+p[1]+(h<12?" AM":" PM"); }
-/* Match each dose due in a day to at most one Meds entry for that medicine, from 2 hours before it until 2 hours before the next dose. */
-function dosesFor(k,pool){
-  var st=windowStart(k), en=windowEnd(k), out=[], now=Date.now();
-  (S.meds||[]).forEach(function(md){
-    if(!md.times||!md.times.length) return;
-    if(md.added&&windowEnd(k)<=md.added) return;
-    var dues=md.times.map(function(v){return mapTime(k,v);}).sort(function(a,b){return a-b;});
-    var ents=pool.filter(function(e){return e.tr==="meds"&&e.med===md.id&&e.t>=st-2*3600000&&e.t<en;}).sort(function(a,b){return a.t-b.t;}), used={};
-    dues.forEach(function(d,i){
-      var lo=d-2*3600000, hi=i+1<dues.length? dues[i+1]-2*3600000 : en, hit=null;
-      ents.forEach(function(e){ if(!hit&&!used[e.id]&&e.t>=lo&&e.t<hi) hit=e; });
-      if(hit) used[hit.id]=1;
-      out.push({med:md,due:d,entry:hit,status:hit?(hit.as==="skipped"?"skipped":"taken"):(now>=d?"due":"upcoming")});
-    });
-  });
+function slotTime(s){ return (S.medTimes&&S.medTimes[s])||SLOT_DEF[s]; }
+function onTimeMs(){ return (S.onTimeMin||30)*60000; }
+function medsIn(s,k){ return (S.meds||[]).filter(function(m){ return (m.slots||[]).indexOf(s)>=0&&(!m.added||!k||m.added<windowEnd(k)); }); }
+function pillCount(list){ return list.reduce(function(a,m){ return a+(+m.count||1); },0); }
+/* Older medications kept due times per pill; fold each time into the nearest of morning, noon or night. */
+function migrateMeds(meds){ return (meds||[]).map(function(m){ if(m.slots) return m; var sl=[]; (m.times||[]).forEach(function(v){ var h=+v.split(":")[0], s=h<11?"am":h<16?"noon":"pm"; if(sl.indexOf(s)<0) sl.push(s); }); return {id:m.id,name:m.name,dose:m.dose||"",count:1,slots:sl,added:m.added}; }); }
+/* How early or late a slot entry was, against the due time saved with it. */
+function timing(e){ if(!e||e.as==="skipped"||!e.due) return null; var d=e.t-e.due, a=Math.abs(d);
+  if(a<=onTimeMs()) return {on:true,text:"on time",min:Math.round(d/60000)};
+  var m=Math.round(a/60000), txt=m<60? m+" min" : Math.floor(m/60)+"h"+(m%60?" "+(m%60)+"m":"");
+  return {on:false,text:txt+(d>0?" late":" early"),min:Math.round(d/60000)}; }
+/* The morning, noon and night doses for a day, each matched to its logged entry. */
+function slotsFor(k,pool){
+  var st=windowStart(k), en=windowEnd(k), now=Date.now(), out=[];
+  SLOTS.forEach(function(x){ var s=x[0], list=medsIn(s,k); if(!list.length) return;
+    var due=mapTime(k,slotTime(s)), hit=null;
+    pool.forEach(function(e){ if(e.tr==="meds"&&e.slot===s&&((e.due&&e.due>=st&&e.due<en)||(!e.due&&e.t>=st&&e.t<en))&&(!hit||e.t>hit.t)) hit=e; });
+    out.push({slot:s,name:x[1],due:due,meds:list,pills:pillCount(list),entry:hit,status:hit?(hit.as==="skipped"?"skipped":"taken"):(now>=due?"due":"upcoming")}); });
   return out;
 }
-function snoozed(d){ try{ var s=JSON.parse(localStorage.getItem("habitrak3:snooze")||"{}"); return (s[d.med.id+":"+d.due]||0)>Date.now(); }catch(e){ return false; } }
-function snooze(d,min){ try{ var s=JSON.parse(localStorage.getItem("habitrak3:snooze")||"{}"), now=Date.now(); Object.keys(s).forEach(function(k){ if(s[k]<now) delete s[k]; }); s[d.med.id+":"+d.due]=now+min*60000; localStorage.setItem("habitrak3:snooze",JSON.stringify(s)); }catch(e){} }
-var lastDoses=[];
+function snoozed(d){ try{ var s=JSON.parse(localStorage.getItem("habitrak3:snooze")||"{}"); return (s[d.slot+":"+d.due]||0)>Date.now(); }catch(e){ return false; } }
+function snooze(d,min){ try{ var s=JSON.parse(localStorage.getItem("habitrak3:snooze")||"{}"), now=Date.now(); Object.keys(s).forEach(function(k){ if(s[k]<now) delete s[k]; }); s[d.slot+":"+d.due]=now+min*60000; localStorage.setItem("habitrak3:snooze",JSON.stringify(s)); }catch(e){} }
+function logSlot(d,t,skipped){
+  var e={id:newId(),tr:"meds",slot:d.slot,t:t,due:d.due,pills:d.pills}; if(skipped) e.as="skipped";
+  addEntry(e); var tm=timing(e);
+  toast(skipped? "Skipped "+d.name.toLowerCase()+" pills" : d.name+" pills taken · "+fmt(t)+(tm?" · "+tm.text:""),function(){ removeEntry(find(e.id)||e); });
+  render();
+}
+var lastSlots=[];
 function medBannerHTML(){
   if(!(S.meds||[]).length) return "";
-  lastDoses=dosesFor(todayKey,liveEntries());
-  var due=lastDoses.filter(function(d){return d.status==="due"&&!snoozed(d);});
-  var h=due.slice(0,3).map(function(d){ var i=lastDoses.indexOf(d);
-    return '<div class="card medbanner" role="status"><p><b>'+esc(medName(d.med))+'</b> was due at '+fmt(d.due)+'.</p><div class="row">'+
-      '<button type="button" class="pill" data-dose="'+i+'" data-do="now">Took it now</button>'+
-      (Date.now()-d.due>15*60000?'<button type="button" class="pill tonal" data-dose="'+i+'" data-do="ontime">Took it at '+fmt(d.due)+'</button>':'')+
-      '<button type="button" class="pill tonal" data-dose="'+i+'" data-do="skip">Skip</button>'+
-      '<button type="button" class="pill tonal" data-dose="'+i+'" data-do="later">In 30 min</button></div></div>'; }).join("");
-  if(!due.length){ var next=lastDoses.filter(function(d){return d.status==="upcoming";}).sort(function(a,b){return a.due-b.due;})[0];
-    if(next) h='<p class="next">Next dose: '+esc(medName(next.med))+' at '+fmt(next.due)+'</p>'; }
+  lastSlots=slotsFor(todayKey,liveEntries());
+  var due=lastSlots.filter(function(d){return d.status==="due"&&!snoozed(d);});
+  return due.map(function(d){ var i=lastSlots.indexOf(d), late=Date.now()-d.due;
+    return '<div class="card medbanner" role="status"><p><b>Time for your '+d.name.toLowerCase()+' pills</b> ('+d.pills+' pill'+(d.pills===1?'':'s')+'). Due at '+fmt(d.due)+(late>onTimeMs()?', '+dur(late)+' ago':'')+'.</p><div class="row">'+
+      '<button type="button" class="pill big" data-slot="'+i+'" data-do="now">I took them</button>'+
+      (late>15*60000?'<button type="button" class="pill tonal" data-slot="'+i+'" data-do="ontime">Took them at '+fmt(d.due)+'</button>':'')+
+      '<button type="button" class="pill tonal" data-slot="'+i+'" data-do="later">Remind me in 30 min</button>'+
+      '<button type="button" class="pill tonal" data-slot="'+i+'" data-do="skip">Skip</button></div></div>'; }).join("");
+}
+function medCardHTML(){
+  if(!(S.meds||[]).some(function(m){return (m.slots||[]).length;})) return "";
+  var h='<div class="card medcard"><p class="lbl2" style="margin-top:0">Medications today</p><div class="slotgrid">'+lastSlots.map(function(d,i){
+    var e=d.entry, tm=timing(e), stat;
+    if(d.status==="taken") stat='<span class="ok">✓ '+fmt(e.t)+'</span><span class="'+(tm&&tm.on?'ok':'late')+'">'+(tm?tm.text:'')+'</span>';
+    else if(d.status==="skipped") stat='<span class="late">Skipped</span>';
+    else if(d.status==="due") stat='<span class="late">Due '+fmt(d.due)+'</span>';
+    else stat='<span>'+fmt(d.due)+'</span>';
+    return '<button type="button" class="slot slot-'+d.status+'" data-slotbtn="'+i+'" aria-label="'+esc(d.name+' pills, '+d.pills+', '+(d.status==="taken"?'taken at '+fmt(e.t):d.status==="upcoming"?'due at '+fmt(d.due):d.status))+'"><b>'+d.name+'</b><small>'+d.pills+' pill'+(d.pills===1?'':'s')+'</small>'+stat+'</button>'; }).join("")+'</div>';
+  h+=lastSlots.map(function(d,i){ if(!showPills[d.slot]) return "";
+    var missed=(d.entry&&d.entry.missed)||[];
+    return '<div class="pilllist"><p><b>'+d.name+' pills</b>'+(d.status==="taken"?' <span class="sub">· tap Taken or Missed to switch</span>':'')+'</p><ul>'+d.meds.map(function(m){ var miss=missed.indexOf(m.id)>=0;
+      return '<li><span>'+esc(medName(m))+((+m.count||1)>1?' × '+m.count:'')+'</span>'+(d.status==="taken"?'<button type="button" class="pill tonal'+(miss?' missbtn':'')+'" aria-pressed="'+(!miss)+'" data-missed="'+i+'" data-med="'+m.id+'">'+(miss?'Missed ✗':'Taken ✓')+'</button>':'')+'</li>'; }).join("")+'</ul></div>'; }).join("");
+  h+='<div class="row" style="margin-top:8px">'+lastSlots.map(function(d){ return '<button type="button" class="linkish" data-show="'+d.slot+'">'+(showPills[d.slot]?'Hide':'See')+' '+d.name.toLowerCase()+' pills</button>'; }).join("")+'</div></div>';
   return h;
 }
-function bindMedBanner(m){
-  m.querySelectorAll("[data-dose]").forEach(function(b){b.addEventListener("click",function(){
-    var d=lastDoses[+b.dataset.dose]; if(!d) return; var act=b.dataset.do, nm=medName(d.med);
-    if(act==="later"){ snooze(d,30); toast("Reminder for "+nm+" in 30 minutes",null); render(); return; }
-    var e={id:newId(),tr:"meds",med:d.med.id,t:act==="now"?Date.now():d.due};
-    if(act==="skip"){ e.as="skipped"; e.t=d.due; }
-    addEntry(e);
-    toast((act==="skip"?"Skipped "+nm:nm+" taken · "+fmt(e.t)),function(){ removeEntry(find(e.id)||e); });
-    render(); });});
+function bindMeds(m){
+  m.querySelectorAll("[data-slot]").forEach(function(b){b.addEventListener("click",function(){
+    var d=lastSlots[+b.dataset.slot]; if(!d) return; var act=b.dataset.do;
+    if(act==="later"){ snooze(d,30); toast("I'll remind you about "+d.name.toLowerCase()+" pills in 30 minutes",null); render(); return; }
+    logSlot(d, act==="ontime"? d.due : Date.now(), act==="skip"); });});
+  m.querySelectorAll("[data-slotbtn]").forEach(function(b){b.addEventListener("click",function(){
+    var d=lastSlots[+b.dataset.slotbtn]; if(!d) return;
+    if(d.status==="taken"||d.status==="skipped"){ showPills[d.slot]=!showPills[d.slot]; render(); return; }
+    logSlot(d,Date.now(),false); });});
+  m.querySelectorAll("[data-show]").forEach(function(b){b.addEventListener("click",function(){ showPills[b.dataset.show]=!showPills[b.dataset.show]; render(); });});
+  m.querySelectorAll("[data-missed]").forEach(function(b){b.addEventListener("click",function(){
+    var d=lastSlots[+b.dataset.missed]; if(!d||!d.entry) return; var e=find(d.entry.id)||d.entry, id=b.dataset.med;
+    var ms=(e.missed||[]).slice(), i=ms.indexOf(id); if(i>=0) ms.splice(i,1); else ms.push(id); e.missed=ms; persistDay(e._day||dayKey(e.t)); render(); });});
 }
 function medPickHTML(){
   if(!medPick) return "";
-  return '<div class="card"><p class="lbl2" style="margin-top:0">Which one?</p><div class="chips" style="margin-bottom:0">'+S.meds.map(function(md){return '<button type="button" class="chip" style="--c:'+col("meds")+'" data-takemed="'+md.id+'">'+svg("meds")+esc(medName(md))+'</button>';}).join("")+
+  var asNeeded=(S.meds||[]).filter(function(md){return !(md.slots||[]).length;});
+  return '<div class="card"><p class="lbl2" style="margin-top:0">Which one?</p><div class="chips" style="margin-bottom:0">'+
+    lastSlots.map(function(d,i){ return '<button type="button" class="chip" style="--c:'+col("meds")+'" data-pickslot="'+i+'">'+svg("meds")+d.name+' pills</button>'; }).join("")+
+    asNeeded.map(function(md){return '<button type="button" class="chip" style="--c:'+col("meds")+'" data-takemed="'+md.id+'">'+svg("meds")+esc(medName(md))+'</button>';}).join("")+
     '<button type="button" class="chip" style="--c:'+col("meds")+'" data-takemed="">Other</button><button type="button" class="chip" style="--c:var(--muted)" data-takemed="cancel">Cancel</button></div></div>';
 }
 function bindMedPick(m){
+  m.querySelectorAll("[data-pickslot]").forEach(function(b){b.addEventListener("click",function(){ medPick=false; var d=lastSlots[+b.dataset.pickslot]; if(d) logSlot(d,Date.now(),false); });});
   m.querySelectorAll("[data-takemed]").forEach(function(b){b.addEventListener("click",function(){
     var id=b.dataset.takemed; medPick=false;
     if(id==="cancel"){ render(); return; }
@@ -526,35 +575,45 @@ function bindMedPick(m){
 function medsManagerHTML(){
   var list=(S.meds||[]);
   var h='<p class="lbl2">Medications</p><div class="card">';
-  if(!list.length&&!medForm) h+='<p class="empty" style="padding-top:0">Add your medications to get a reminder on Today when a dose is due.</p>';
-  h+=list.map(function(md){ return '<div class="field"><span><b>'+esc(medName(md))+'</b><small>'+(md.times&&md.times.length? md.times.map(fmtHM).join(", ") : "As needed, no reminder")+'</small></span><span class="medbtns"><button type="button" class="pill tonal" data-medit="'+md.id+'">Edit</button><button type="button" class="pill danger" data-mdel="'+md.id+'">Remove</button></span></div>'; }).join("");
+  h+='<p class="sub" style="margin-top:0">Dose times</p><div class="addtimes">'+SLOTS.map(function(x){ return '<label>'+x[1]+'<input type="time" data-slottime="'+x[0]+'" value="'+slotTime(x[0])+'"></label>'; }).join("")+'</div>';
+  h+='<div class="field"><span>Counts as on time<small>Taken within this many minutes of the dose time.</small></span><span class="chips" style="margin:0">'+[15,30,60].map(function(v){ return '<button type="button" class="chip" style="--c:var(--brand)" data-ontime="'+v+'" aria-pressed="'+((S.onTimeMin||30)===v)+'">±'+v+' min</button>'; }).join("")+'</span></div>';
+  if(!list.length&&!medForm) h+='<p class="empty">Add each medication and pick morning, noon or night. Today then shows one button per dose time, and a reminder when it\'s due.</p>';
+  if(list.length){ h+='<p class="sub" style="margin:10px 0 0">'+list.length+' medication'+(list.length===1?'':'s')+' · '+SLOTS.map(function(x){ var ms=medsIn(x[0]); return x[1]+' '+pillCount(ms); }).join(' · ')+' pills</p>'; }
+  h+=list.map(function(md){ var sl=(md.slots||[]).map(slotName).join(", ")||"As needed";
+    return '<div class="field"><span><b>'+esc(medName(md))+'</b><small>'+((+md.count||1)>1?md.count+' pills · ':'')+sl+'</small></span><span class="medbtns"><button type="button" class="pill tonal" data-medit="'+md.id+'">Edit</button><button type="button" class="pill danger" data-mdel="'+md.id+'">Remove</button></span></div>'; }).join("");
   if(medForm){
     h+='<div class="medform"><label>Name<input type="text" id="mf-name" value="'+esc(medForm.name||"")+'" placeholder="Metformin" autocomplete="off"></label>'+
-       '<label>Dose (optional)<input type="text" id="mf-dose" value="'+esc(medForm.dose||"")+'" placeholder="500 mg" autocomplete="off"></label>'+
-       '<p class="sub" style="margin:4px 0 6px">Times it\'s due</p><div class="chips" style="margin-bottom:8px">'+(medForm.times.length? medForm.times.map(function(v,i){return '<button type="button" class="chip" style="--c:var(--brand)" data-mtime="'+i+'" aria-label="Remove '+fmtHM(v)+'">'+fmtHM(v)+' ✕</button>';}).join("") : '<span class="sub" style="margin:0">None yet. Leave empty for as-needed.</span>')+'</div>'+
-       '<div class="addtimes"><label>Add a time<input type="time" id="mf-time" value="08:00"></label></div><div class="row"><button type="button" class="pill tonal" id="mf-addtime">Add time</button><button type="button" class="pill" id="mf-save">Save medication</button><button type="button" class="pill tonal" id="mf-cancel">Cancel</button></div></div>';
+       '<label>Strength (optional)<input type="text" id="mf-dose" value="'+esc(medForm.dose||"")+'" placeholder="500 mg" autocomplete="off"></label>'+
+       '<div class="field" style="border:0;padding:0"><span>Pills each time</span><span class="step" style="border:1px solid var(--line)"><span><b>'+(medForm.count||1)+'</b></span><span style="display:flex;padding:0"><button type="button" id="mf-less" aria-label="One fewer pill">−</button><button type="button" id="mf-more" aria-label="One more pill">+</button></span></span></div>'+
+       '<p class="sub" style="margin:4px 0 6px">When</p><div class="chips" style="margin-bottom:8px">'+SLOTS.map(function(x){ return '<button type="button" class="chip" style="--c:var(--brand)" data-mslot="'+x[0]+'" aria-pressed="'+(medForm.slots.indexOf(x[0])>=0)+'">'+x[1]+' · '+fmtHM(slotTime(x[0]))+'</button>'; }).join("")+'</div>'+
+       '<p class="sub" style="margin:0">Pick none for as-needed medication.</p>'+
+       '<div class="row"><button type="button" class="pill" id="mf-save">'+(medForm.id?'Save changes':'Save and add another')+'</button><button type="button" class="pill tonal" id="mf-cancel">Done</button></div></div>';
   } else h+='<button type="button" class="pill tonal addopen" id="mf-new" style="margin:10px 0 0">+ Add a medication</button>';
   h+='<p class="sub" style="margin:10px 0 0">Reminders show on Today while Habitrak is open. Phone notifications come with the Android app.</p></div>';
   return h;
 }
 function bindMedsManager(m){
   function keep(){ var n=$("mf-name"), d=$("mf-dose"); if(n) medForm.name=n.value; if(d) medForm.dose=d.value; }
-  var nw=$("mf-new"); if(nw) nw.addEventListener("click",function(){ medForm={name:"",dose:"",times:[]}; render(); var n=$("mf-name"); if(n) n.focus(); });
-  m.querySelectorAll("[data-medit]").forEach(function(b){b.addEventListener("click",function(){ var md=medById(b.dataset.medit); if(!md) return; medForm={id:md.id,name:md.name,dose:md.dose||"",times:(md.times||[]).slice(),added:md.added}; render(); });});
+  m.querySelectorAll("[data-slottime]").forEach(function(inp){ inp.addEventListener("change",function(){ if(!inp.value) return; S.medTimes=S.medTimes||{}; S.medTimes[inp.dataset.slottime]=inp.value; persistSettings(); toast(slotName(inp.dataset.slottime)+" pills now due at "+fmtHM(inp.value),null); }); });
+  m.querySelectorAll("[data-ontime]").forEach(function(b){ b.addEventListener("click",function(){ S.onTimeMin=+b.dataset.ontime; persistSettings(); render(); }); });
+  var nw=$("mf-new"); if(nw) nw.addEventListener("click",function(){ medForm={name:"",dose:"",count:1,slots:["am"]}; render(); var n=$("mf-name"); if(n) n.focus(); });
+  m.querySelectorAll("[data-medit]").forEach(function(b){b.addEventListener("click",function(){ var md=medById(b.dataset.medit); if(!md) return; medForm={id:md.id,name:md.name,dose:md.dose||"",count:+md.count||1,slots:(md.slots||[]).slice(),added:md.added}; render(); });});
   m.querySelectorAll("[data-mdel]").forEach(function(b){b.addEventListener("click",function(){ var i=-1; S.meds.forEach(function(x,j){ if(x.id===b.dataset.mdel) i=j; }); if(i<0) return;
     var md=S.meds.splice(i,1)[0]; persistSettings(); toast("Removed "+medName(md),function(){ S.meds.splice(i,0,md); persistSettings(); }); render(); });});
   if(!medForm) return;
-  m.querySelectorAll("[data-mtime]").forEach(function(b){b.addEventListener("click",function(){ keep(); medForm.times.splice(+b.dataset.mtime,1); render(); });});
-  $("mf-addtime").addEventListener("click",function(){ keep(); var v=$("mf-time").value; if(!v) return; if(medForm.times.indexOf(v)<0) medForm.times.push(v); medForm.times.sort(); render(); });
+  m.querySelectorAll("[data-mslot]").forEach(function(b){b.addEventListener("click",function(){ keep(); var s=b.dataset.mslot, i=medForm.slots.indexOf(s); if(i>=0) medForm.slots.splice(i,1); else medForm.slots.push(s); render(); });});
+  $("mf-less").addEventListener("click",function(){ keep(); medForm.count=Math.max(1,(medForm.count||1)-1); render(); });
+  $("mf-more").addEventListener("click",function(){ keep(); medForm.count=Math.min(10,(medForm.count||1)+1); render(); });
   $("mf-cancel").addEventListener("click",function(){ medForm=null; render(); });
   $("mf-save").addEventListener("click",function(){ keep(); var name=(medForm.name||"").trim();
     if(!name){ toast("Add the medication's name",null); return; }
-    var rec={id:medForm.id||newId(),name:name.slice(0,60),dose:(medForm.dose||"").trim().slice(0,30),times:medForm.times.slice(0,8),added:medForm.added||Date.now()};
+    var order=["am","noon","pm"], rec={id:medForm.id||newId(),name:name.slice(0,60),dose:(medForm.dose||"").trim().slice(0,30),count:medForm.count||1,slots:order.filter(function(s){return medForm.slots.indexOf(s)>=0;}),added:medForm.added||Date.now()};
     if(!S.meds) S.meds=[];
     var i=-1; S.meds.forEach(function(x,j){ if(x.id===rec.id) i=j; }); if(i>=0) S.meds[i]=rec; else S.meds.push(rec);
-    var msg="Saved "+medName(rec);
+    var msg="Saved "+medName(rec), wasEdit=!!medForm.id;
     if(S.sel.indexOf("meds")<0&&S.sel.length<MAX){ S.sel.push("meds"); msg+=". Meds added to your tiles."; }
-    medForm=null; persistSettings(); toast(msg,null); render(); });
+    medForm= wasEdit? null : {name:"",dose:"",count:1,slots:rec.slots.slice()};
+    persistSettings(); toast(msg,null); render(); var n=$("mf-name"); if(n) n.focus(); });
 }
 
 /* ---------- trends: averages over time ---------- */
@@ -625,11 +684,14 @@ function renderTrends(m){
       chartSVG(tr,bs,avg)+'<p class="tcap">'+(weekly?"Each bar is a week's daily average. ":"")+'Tap a bar for its number. Dashed line: average.</p></div>';
   });
   var adh='';
-  if((S.meds||[]).some(function(md){return md.times&&md.times.length;})){
-    var rows=S.meds.filter(function(md){return md.times&&md.times.length;}).map(function(md){ var due=0,took=0,skip=0;
-      keys.forEach(function(k){ dosesFor(k,pool).forEach(function(d){ if(d.med.id!==md.id||d.status==="upcoming") return; due++; if(d.status==="taken") took++; if(d.status==="skipped") skip++; }); });
-      return '<tr><td>'+esc(medName(md))+(skip?' <span style="color:var(--muted)">· '+skip+' skipped</span>':'')+'</td><td>'+(due? took+' of '+due+' doses ('+Math.round(took/due*100)+'%)' : 'No doses due yet')+'</td></tr>'; }).join("");
-    adh='<div class="tcard"><div class="thead">'+svg("meds")+'<span>Medication doses taken</span></div><table class="tot">'+rows+'</table></div>';
+  if((S.meds||[]).some(function(md){return (md.slots||[]).length;})){
+    var rows=SLOTS.map(function(x){ var due=0,took=0,on=0,skip=0,lateSum=0,lateN=0;
+      keys.forEach(function(k){ slotsFor(k,pool).forEach(function(d){ if(d.slot!==x[0]||d.status==="upcoming") return; due++;
+        if(d.status==="skipped") skip++; if(d.status==="taken"){ took++; var tm=timing(d.entry); if(tm){ if(tm.on) on++; lateSum+=tm.min; lateN++; } } }); });
+      if(!due) return "";
+      var avgMin=lateN? Math.round(lateSum/lateN) : 0, usual= !lateN? "" : Math.abs(avgMin)<=(S.onTimeMin||30)? "on average on time" : "on average "+Math.abs(avgMin)+" min "+(avgMin>0?"late":"early");
+      return '<tr><td><b>'+x[1]+'</b><span class="note">'+took+' of '+due+' taken'+(skip?' · '+skip+' skipped':'')+(usual?' · '+usual:'')+'</span></td><td>'+(took? on+' of '+took+' on time' : '–')+'</td></tr>'; }).join("");
+    if(rows) adh='<div class="tcard"><div class="thead">'+svg("meds")+'<span>Medications on time</span></div><table class="tot">'+rows+'</table><p class="tcap">On time means within ±'+(S.onTimeMin||30)+' minutes of the dose time.</p></div>';
   }
   m.innerHTML=rng+'<p class="sub">Averages count only the '+nLog+' day'+(nLog===1?'':'s')+' you logged in '+(trRange==="all"?"your history":"the last "+n+" days")+'.</p><div class="tgrid">'+cards.join("")+adh+'</div>';
   bindRange(m);
@@ -646,7 +708,7 @@ function renderNav(){
 }
 $("navbtns").addEventListener("click",function(ev){ var b=ev.target.closest("[data-tab]"); if(!b) return; tab=b.dataset.tab; editing=null; confirmErase=false; dayView=null; addOpen=false; medPick=false; medForm=null; if(tab==="trends") trLoaded=false; if(tab==="week") weekCache=null; render(); window.scrollTo(0,0); });
 function head(t,s){ $("title").textContent=t; $("sub").textContent=s; }
-function label(e){ var c=CAT[e.tr]; if(e.tr==="meds"&&e.med){ var md=medById(e.med), nm=md?medName(md):"Meds"; return e.as==="skipped"? "Skipped "+nm : "Meds · "+nm; } if(e.as==="resisted") return "Resisted "+lower(e.tr); if(e.as==="given") return "Gave a "+lower(e.tr)+" away"; return c.n; }
+function label(e){ var c=CAT[e.tr]; if(e.tr==="meds"&&e.slot){ var sn=slotName(e.slot); if(e.as==="skipped") return "Skipped "+sn.toLowerCase()+" pills"; var tm=timing(e), ms=(e.missed||[]).length; return sn+" pills"+(e.pills?" ("+e.pills+")":"")+(tm?" · "+tm.text:"")+(ms?" · "+ms+" missed":""); } if(e.tr==="meds"&&e.med){ var md=medById(e.med), nm=md?medName(md):"Meds"; return e.as==="skipped"? "Skipped "+nm : "Meds · "+nm; } if(e.as==="resisted") return "Resisted "+lower(e.tr); if(e.as==="given") return "Gave a "+lower(e.tr)+" away"; return c.n; }
 
 /* ---------- loading any day, and entries across loaded days ---------- */
 function ensureDays(keys){
@@ -702,6 +764,7 @@ function bindTimeline(m){
 var addOpen=false, addTr=null, addAs="", addDraft={};
 function asOptions(tr){
   if(CAT[tr].k!=="m") return [];
+  if(tr==="meds"){ var o=[["","One medication"]]; SLOTS.forEach(function(x){ if(medsIn(x[0]).length) o.push(["slot:"+x[0],x[1]+" pills"]); }); return o.length>1? o : []; }
   var g=S.goals[tr], o=[["","Logged"]];
   if((g&&(g.cap||g.wait))||tr==="smoke"||tr==="drink") o.push(["resisted","Resisted"]);
   if(tr==="smoke") o.push(["given","Gave away"]);
@@ -737,6 +800,7 @@ function bindAdd(m,k){
     var e={id:newId(),tr:tr,t:t};
     if(c.k==="s"){ var evv=$("add-e").value; if(!evv){ toast("Pick an end time",null); return; }
       e.end=endAfter(t,evv); if(e.end>now){ toast("That end time hasn't happened yet",null); return; } }
+    else if(addAs&&addAs.indexOf("slot:")===0){ var sl=addAs.slice(5), dk=dayKey(t); e.slot=sl; e.due=mapTime(dk,slotTime(sl)); e.pills=pillCount(medsIn(sl,dk)); }
     else if(addAs) e.as=addAs;
     addEntry(e); addDraft={};
     toast(label(e)+" added · "+fmt(e.t)+(c.k==="s"?"–"+fmt(e.end):""),function(){ removeEntry(find(e.id)||e); });
@@ -751,7 +815,7 @@ function renderToday(m){
   if(r) a+='<span class="dot" style="background:'+col(r.tr)+'"></span><div class="txt"><b>Now · '+esc(CAT[r.tr].n)+'</b><span>Since '+fmt(r.t)+' · '+dur(n-r.t)+'</span></div><button type="button" class="pill tonal" data-stop>Stop</button>';
   else a+='<span class="dot" style="background:var(--line)"></span><div class="txt"><b>Nothing running</b><span>Tap a stretch below to start one.</span></div>';
   a+='</div>';
-  a=medBannerHTML()+a;
+  a=medBannerHTML()+medCardHTML()+a;
   if(wake) a+=checkinHTML(wake);
   a+='<div class="card">'+ribbon(todayEntries(),windowStart(todayKey),{now:true,h:34,label:"Today so far"})+hourLabels()+'</div>';
   a+='<p class="lbl2">Tap to log</p><div class="tiles">'+S.sel.map(tileHTML).join("")+'</div>'+medPickHTML()+extrasHTML();
@@ -759,7 +823,7 @@ function renderToday(m){
   var b='<p class="lbl2">Timeline</p>'+addFormHTML(todayKey)+timelineHTML(list,"Nothing logged yet today. Tap a tile when something happens.");
   m.innerHTML='<div class="cols"><div>'+a+'</div><div>'+b+'</div></div>';
   if(wake) bindCheckin(m,wake);
-  bindMedBanner(m); bindMedPick(m);
+  bindMeds(m); bindMedPick(m);
   bindAdd(m,todayKey); bindTimeline(m);
 }
 
@@ -874,7 +938,7 @@ function renderTrackers(m){
     $("erase-no").addEventListener("click",function(){ confirmErase=false; render(); });
     $("erase-yes").addEventListener("click",function(){ $("erase-yes").disabled=true; setSave("busy","Erasing…");
       Object.keys(subs).forEach(function(x){ try{subs[x]();}catch(e){} }); subs={}; days={}; todayKey=null;
-      store.erase().then(function(){ S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:myTz(),meds:[]}; setupStep=1; confirmErase=false; tab="today"; setSave("ok",savedLabel()); syncDays(); render(); toast("Everything erased",null); },
+      store.erase().then(function(){ S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:myTz(),meds:[],medTimes:{},onTimeMin:30}; setupStep=1; confirmErase=false; tab="today"; setSave("ok",savedLabel()); syncDays(); render(); toast("Everything erased",null); },
         function(e){ onStoreError(e); confirmErase=false; syncDays(); render(); toast("Couldn't erase everything. Try again.",null); }); });
   }
 }
@@ -941,7 +1005,7 @@ function boot(st){
   store=st; setSave("ok",savedLabel());
   Promise.all([store.loadSettings(), store.getImport().catch(function(){return null;})]).then(function(r){
     var o=r[0], imp=r[1];
-    if(o&&o.sel) S={sel:o.sel.filter(function(t){return CAT[t];}).slice(0,MAX),goals:o.goals||{},dayStart:o.dayStart||"05:00",setup:!!o.setup,tz:o.tz||"",meds:Array.isArray(o.meds)?o.meds:[]};
+    if(o&&o.sel) S={sel:o.sel.filter(function(t){return CAT[t];}).slice(0,MAX),goals:o.goals||{},dayStart:o.dayStart||"05:00",setup:!!o.setup,tz:o.tz||"",meds:migrateMeds(Array.isArray(o.meds)?o.meds:[]),medTimes:o.medTimes||{},onTimeMin:o.onTimeMin||30};
     else if(imp&&!imp.done) S={sel:(imp.sel||FIRST_RUN).filter(function(t){return CAT[t];}).slice(0,MAX),goals:imp.goals||{},dayStart:imp.dayStart||"05:00",setup:false,tz:""};
     else S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:""};
     if(!S.sel.length) S.sel=FIRST_RUN.slice();
