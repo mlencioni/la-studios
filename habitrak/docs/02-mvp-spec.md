@@ -27,7 +27,7 @@ The home-screen widget **is** the product. The app exists to set it up and to lo
 | Kind | One tap does | Examples | Shown as |
 |---|---|---|---|
 | **Moment** | Logs one, right now | Coffee, Water, Smoke, Drink, Meal, Snack, Meds | A tick on the day ribbon and a count on the tile |
-| **Stretch** | Starts it; tap again to stop. Starting another stops the current one | Work, Chores, Walk, Commute, Rest, Screen time, Sleep, Stretch, Workout | A colored band on the day ribbon; "Now: Work · 1h 12m" |
+| **Stretch** | Starts it; tap again to stop. Starting another stops the current one | Work, Focus, AI, Chores, Walk, Commute, Rest, Screen time, Sleep, Stretch, Workout | A colored band on the day ribbon; "Now: Work · 1h 12m" |
 
 Only one stretch runs at a time. That keeps the model simple enough to explain in one sentence: *"Tap a moment when it happens. Tap a stretch to start it, tap again to stop."*
 
@@ -70,6 +70,7 @@ Onboarding is two screens: **pick what to track** (presets, up to 9, change anyt
 - Edit time on any entry; late logging with a time window (from 2.0)
 - **Medication schedule** (added Oct 13, 2026, for an elderly patient on about 20 pills a day): in Trackers, set Morning, Noon and Night dose times, and the on-time window (±15, 30 or 60 min). Each medication has a name, strength, pills each time, and which of Morning, Noon and Night it's taken (none means as needed). Today shows a Medications card with one large button per dose time, its pill count and status. A reminder banner appears when a dose time arrives: "I took them", "Took them at <due time>", "Remind me in 30 min", or "Skip". One tap logs the whole dose. Each log entry records how early or late it was ("on time", "25 min late"); a single missed pill can be marked within a taken dose. Trends shows, for each dose time, doses taken, how many were on time, and the usual lateness
 - **Medications** (added Oct 9, 2026, replaced by the schedule above): a list in Trackers with name, dose and due times. Today shows a reminder banner for any dose that is due and not logged: Took it now, Took it at the due time, Skip, or remind in 30 minutes. The Meds tile asks which medication. Reminders show only while the app is open; phone notifications come with the Android build
+- **Stretch and bedtime reminders** (added Oct 15, 2026): set in Me (Trackers in the web app). Stretch every 30 min to 2 hours, counted from waking or the last stretch, quiet while asleep, while stretching and after bedtime ("I stretched" logs 5 minutes, In 15 min, Skip). Bedtime from a sleep goal (default 8 hours), planned from the wake-up time you want or from when you woke today; "Going to bed" starts Sleep, In 15 min, Not tonight. In the web app they pop up on any screen while it's open; the Android build sends them as notifications
 - **Fix any day, not just today** (added Oct 9, 2026 from Mark's use): "Add something you missed" on Today and on every past day. On Today, a time later than now counts as last night, so a forgotten night of Sleep can be added the next morning. An end earlier than the start means the next morning
 - Works fully offline; account optional at first launch, needed only for sync and backup
 - Light and dark themes, 48dp targets, TalkBack labels on every tile

@@ -2,6 +2,16 @@
 
 Newest first. Each entry: what changed, why, and what's next.
 
+## Oct 15, 2026: Stretch and bedtime reminders; Focus and AI trackers
+
+- **Reminders (Mark's ask):** a card pops up at the top of any screen while Habitrak is open, with an optional chime. Set in Trackers, under Reminders.
+  - **Stretch:** every 30 min, 45 min, 1 hour, 1.5 hours or 2 hours. Counted from when you woke up or last stretched; quiet while you sleep, while a stretch is running, and after bedtime. "I stretched" logs a 5-minute stretch without stopping what's running; also "Start a stretch", "In 15 min" and "Skip this one".
+  - **Bedtime:** a sleep goal (8 hours by default, in half hours) planned from either the time you want to wake up (bedtime = wake-up minus the goal) or when you woke today (bedtime = woke plus 24 hours minus the goal). Shows from bedtime for up to 5 hours unless you're asleep: "Going to bed" starts Sleep, plus "In 15 min" and "Not tonight". Today shows "Bedtime tonight: 11:00 PM".
+  - **Medications:** a due dose also pops up when you're not on Today.
+- **Focus and AI (Mark's ask):** two new stretches, like Work: tap to start, Stop or another stretch ends it. Time a day shows in Trends. Added in the app and the prototype.
+- **Limit:** reminders only show while Habitrak is open. Alerts on a locked phone come with the Android build.
+- **Tested:** with a fixed clock at S5 and iPad sizes: stretch due after waking, logging and snoozing it, following you to other tabs; bedtime at 11:00 PM for a 7:00 AM wake-up, hidden at 10:50, shown at 11:01, "Going to bed" starts Sleep, "Not tonight" stays quiet.
+
 ## Oct 13, 2026: Medication schedule for an elderly patient
 
 - **Mark's requirement:** design for someone taking about 20 pills a day, in the morning, at noon and at night.

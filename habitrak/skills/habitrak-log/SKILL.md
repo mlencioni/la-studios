@@ -1,6 +1,6 @@
 ---
 name: habitrak-log
-description: Log smokes, drinks, water, resists, give-aways, sleep and any other Habitrak tracker into Mark's Habitrak 3.0 app by voice or text, from any chat or project. Use whenever Mark says anything like "log a smoke", "log a drink", "I just made a drink", "resisted one", "gave one away", "forgot to log one at 3", "going to bed", "I'm up", "starting work", "done with my workout", or asks what he has logged today. Treat it as a self-contained side task.
+description: Log smokes, drinks, water, resists, give-aways, sleep and any other Habitrak tracker into Mark's Habitrak 3.0 app by voice or text, from any chat or project. Use whenever Mark says anything like "log a smoke", "log a drink", "I just made a drink", "resisted one", "gave one away", "forgot to log one at 3", "going to bed", "I'm up", "starting work", "starting focus time", "using AI", "I stretched", "done with my workout", or asks what he has logged today. Treat it as a self-contained side task.
 ---
 
 # Habitrak 3.0 logging
@@ -23,7 +23,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
 | Field | Meaning |
 |---|---|
 | `id` | Unique string. Use `v` + the current time in base 36 + 3 random letters |
-| `tr` | Tracker: moments `coffee` `water` `meal` `snack` `smoke` `drink` `meds`; stretches `work` `chores` `walk` `commute` `rest` `screen` `sleep` `stretch` `workout` |
+| `tr` | Tracker: moments `coffee` `water` `meal` `snack` `smoke` `drink` `meds`; stretches `work` `focus` `ai` `chores` `walk` `commute` `rest` `screen` `sleep` `stretch` `workout` |
 | `t` | Start time, epoch milliseconds |
 | `end` | Stretches only: end time in ms, or `null` while running |
 | `as` | Optional: `"resisted"` (skipped one) or `"given"` (gave a smoke away). These don't count as smoked or drunk |
@@ -42,6 +42,7 @@ A day document looks like `{"entries":[...], "checkin": {...} or null, "updated"
    - **Scheduled pills** ("I took my morning pills", "took my night meds", or "I took them" right after a reminder): append `{id, tr:"meds", slot, t, due, pills}`. Skipped: add `as:"skipped"`. Reply with how early or late it was against `due`: within `profile.onTimeMin` minutes (default 30) is "on time"; otherwise say "25 min late" or "10 min early".
    - **Medication** ("took my Metformin"): match the name in `profile.meds` and append `{id, tr:"meds", med, t}`. If no name matches, log plain `{id, tr:"meds", t}` and say so.
    - **Start a stretch** ("going to bed", "starting work"): first stop any running stretch (an entry with `end: null` in today's or yesterday's document) by setting its `end` to now. Then append `{id, tr, t, end: null}`.
+   - **"I stretched"** (a quick stretch, often after a reminder): append `{id, tr:"stretch", t: now minus 5 minutes, end: now}` and leave any running stretch alone.
    - **Stop a stretch** ("I'm up", "done with work"): set `end` on the running entry with that `tr`.
    - **"Finished my smoke/drink":** Habitrak 3.0 logs moments only, so there's nothing to change. Say so in a few words.
 5. `set` the whole document back with `{"entries": [...], "checkin": <unchanged>, "updated": <now ms>}`. Pass `if_version` from your read when the document existed; omit it when creating. If the write is refused because the version changed, read again and redo the change. Never overwrite Mark's newer entries.

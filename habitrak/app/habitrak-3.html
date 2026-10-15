@@ -8,7 +8,7 @@
   --bg:#F8FAF8; --ink:#17201E; --muted:#58645F; --line:#CCD5D1;
   --brand:#1C6A61; --on-brand:#FFFFFF; --brand-soft:#D3E7E2; --tile:#EEF3F1; --good:#2F7A4F; --warn:#8A5D00; --hatch:#00000010; --bad:#B23A3A;
   --t-work:#3E63A8; --t-walk:#2F8A5B; --t-commute:#6B7480; --t-rest:#8A6BC1; --t-screen:#B5507A; --t-sleep:#33407A;
-  --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B; --t-stretch:#2E8C7E; --t-workout:#C0512F; --t-chores:#8C6D1F;
+  --t-coffee:#8A5A34; --t-water:#1E8DB0; --t-meal:#C2871B; --t-smoke:#5B7489; --t-drink:#B4602A; --t-meds:#C24A4A; --t-snack:#7E8F2B; --t-stretch:#2E8C7E; --t-workout:#C0512F; --t-chores:#8C6D1F; --t-focus:#5B4FB5; --t-ai:#A3428F;
   --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
   --f-body:"Roboto Flex",Roboto,"Segoe UI",system-ui,sans-serif;
 }
@@ -16,13 +16,13 @@
   --bg:#141A19; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
   --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --good:#7CC39A; --warn:#E3C15A; --hatch:#FFFFFF0D; --bad:#F08A80;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
-  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C;
+  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C; --t-focus:#A99EF2; --t-ai:#E79AD6;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141A19; --ink:#E3EAE7; --muted:#97A39F; --line:#2E3936;
   --brand:#7FCBBE; --on-brand:#0D2522; --brand-soft:#21403B; --tile:#212A28; --good:#7CC39A; --warn:#E3C15A; --hatch:#FFFFFF0D; --bad:#F08A80;
   --t-work:#86A6E6; --t-walk:#6CC795; --t-commute:#A3ABB6; --t-rest:#B9A0EC; --t-screen:#E58BB0; --t-sleep:#8F9CE0;
-  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C;
+  --t-coffee:#C99A70; --t-water:#62C3E2; --t-meal:#E8B54F; --t-smoke:#9DB4C7; --t-drink:#E39A66; --t-meds:#EE8A8A; --t-snack:#B9C966; --t-stretch:#6FCFC0; --t-workout:#F09A7A; --t-chores:#D9B95C; --t-focus:#A99EF2; --t-ai:#E79AD6;
   color-scheme:dark}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -144,6 +144,14 @@ table.tot tr:last-child td{border-bottom:0}
 .medbanner .row,.medform .row{display:flex;flex-wrap:wrap;gap:8px}
 .medbanner .pill,.medform .pill,.medbtns .pill{min-height:40px;padding:0 14px}
 .medbtns{display:flex;gap:6px;flex:none}
+.remind{position:fixed;left:50%;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));width:calc(100% - 24px);max-width:456px;z-index:8}
+.remcard{border:2px solid var(--brand);background:var(--brand-soft);border-radius:16px;padding:12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.remcard p{margin:0 0 10px}
+.remcard .remtitle{font-weight:700;font-size:1.08rem;margin-bottom:4px}
+.remcard .row{display:flex;flex-wrap:wrap;gap:8px}
+.remcard .pill{min-height:44px;padding:0 14px}
+.remcard .pill.tonal{background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.remcard .remmore{font-size:.8rem;color:var(--muted);margin:8px 0 0}
 .next{font-size:.85rem;color:var(--muted);margin:0 0 12px}
 .medform{display:grid;gap:8px;padding-top:10px}
 .medform label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
@@ -200,6 +208,7 @@ button.weekrow:hover{background:var(--hatch)}
   .tiles .tile{min-height:100px}
   .navbar div{max-width:560px}
   .toast{max-width:560px}
+  .remind{max-width:560px}
 }
 </style>
 
@@ -213,6 +222,7 @@ button.weekrow:hover{background:var(--hatch)}
 </div>
 <nav class="navbar" id="navbar" aria-label="Sections" hidden><div id="navbtns"></div></nav>
 <div class="setupfoot" id="setupfoot" hidden><div><p id="setupcount"></p><button type="button" class="pill" id="setupnext">Next</button></div></div>
+<div class="remind" id="remind" role="alertdialog" aria-live="assertive" aria-label="Reminder" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastmsg"></span><button type="button" id="toastundo">Undo</button></div>
 
 <script>
@@ -235,12 +245,14 @@ var IC={
   sleep:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
   stretch:'<circle cx="12" cy="4.5" r="1.8"/><path d="M4.5 6.5L12 9l7.5-2.5M12 9v5M12 14l-3.5 7M12 14l3.5 7"/>',
   workout:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>',
-  chores:'<path d="M15 3l-5 9M8 12h6l2 9H6z"/><path d="M9 16v5M12 16v5"/>'
+  chores:'<path d="M15 3l-5 9M8 12h6l2 9H6z"/><path d="M9 16v5M12 16v5"/>',
+  focus:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+  ai:'<path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>'
 };
 var CAT={
   coffee:{n:"Coffee",k:"m"}, water:{n:"Water",k:"m"}, meal:{n:"Meal",k:"m"}, snack:{n:"Snack",k:"m"},
   smoke:{n:"Smoke",k:"m"}, drink:{n:"Drink",k:"m"}, meds:{n:"Meds",k:"m"},
-  work:{n:"Work",k:"s"}, chores:{n:"Chores",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}, stretch:{n:"Stretch",k:"s"}, workout:{n:"Workout",k:"s"}
+  work:{n:"Work",k:"s"}, focus:{n:"Focus",k:"s"}, ai:{n:"AI",k:"s"}, chores:{n:"Chores",k:"s"}, walk:{n:"Walk",k:"s"}, commute:{n:"Commute",k:"s"}, rest:{n:"Rest",k:"s"}, screen:{n:"Screen time",k:"s"}, sleep:{n:"Sleep",k:"s"}, stretch:{n:"Stretch",k:"s"}, workout:{n:"Workout",k:"s"}
 };
 var SYMPTOMS=[["tired","Tired"],["foggy","Foggy"],["headache","Headache"],["nausea","Nausea"],["anxious","Anxious"],["shaky","Shaky"],["sweaty","Sweaty"],["fine","Fine"]];
 var MAX=9, FIRST_RUN=["coffee","work","water","walk","meal"];
@@ -322,7 +334,7 @@ function persistSettings(){
   (function loop(){
     if(!settingsDirty){ settingsBusy=false; return; }
     settingsDirty=false;
-    store.saveSettings({sel:S.sel,goals:S.goals,dayStart:S.dayStart,setup:!!S.setup,tz:S.tz||myTz(),meds:S.meds||[],medTimes:S.medTimes||{},onTimeMin:S.onTimeMin||30}).then(loop,function(err){onStoreError(err); settingsBusy=false;});
+    store.saveSettings({sel:S.sel,goals:S.goals,dayStart:S.dayStart,setup:!!S.setup,tz:S.tz||myTz(),meds:S.meds||[],medTimes:S.medTimes||{},onTimeMin:S.onTimeMin||30,rem:S.rem||{}}).then(loop,function(err){onStoreError(err); settingsBusy=false;});
   })();
 }
 
@@ -814,7 +826,7 @@ function renderToday(m){
   var a='<div class="card nowcard">';
   if(r) a+='<span class="dot" style="background:'+col(r.tr)+'"></span><div class="txt"><b>Now · '+esc(CAT[r.tr].n)+'</b><span>Since '+fmt(r.t)+' · '+dur(n-r.t)+'</span></div><button type="button" class="pill tonal" data-stop>Stop</button>';
   else a+='<span class="dot" style="background:var(--line)"></span><div class="txt"><b>Nothing running</b><span>Tap a stretch below to start one.</span></div>';
-  a+='</div>';
+  a+='</div>'+bedtimeLine();
   a=medBannerHTML()+medCardHTML()+a;
   if(wake) a+=checkinHTML(wake);
   a+='<div class="card">'+ribbon(todayEntries(),windowStart(todayKey),{now:true,h:34,label:"Today so far"})+hourLabels()+'</div>';
@@ -925,20 +937,20 @@ function bindPicker(m,onChange){
 function renderTrackers(m){
   head("Trackers","What shows on Today, in this order");
   var h='<div class="narrow"><p class="sub" style="margin-top:0">Up to '+MAX+'. The numbers set the order of your tiles. '+S.sel.length+' of '+MAX+' picked.</p>'+pickerHTML();
-  h+=medsManagerHTML();
+  h+=medsManagerHTML()+remindersHTML();
   h+='<p class="lbl2">Settings</p><div class="card"><div class="field"><span>Day starts at<small>Late nights before this time count as the day before.</small></span><input type="time" id="daystart" value="'+esc(S.dayStart)+'" aria-label="Day starts at"></div>'+
      '<div class="field"><span>Where your log is saved<small>'+(store.kind==="account"?"In your Claude account. Only you can see it, on any device where you're signed in.":"In this browser only. Open Habitrak inside Claude to save to your account.")+'</small></span></div>'+
      '<div class="field"><span>Erase everything<small>Every entry, goal and tracker choice. This can\'t be undone.</small></span><button type="button" class="pill danger" id="erase">Erase</button></div></div>';
   if(confirmErase) h+='<div class="confirm" id="confirmbox"><p><b>Erase your whole Habitrak log?</b> This can\'t be undone.</p><div><button type="button" class="pill danger" id="erase-yes">Erase everything</button><button type="button" class="pill tonal" id="erase-no">Keep it</button></div></div>';
   m.innerHTML=h+'</div>';
-  bindPicker(m,persistSettings); bindMedsManager(m);
+  bindPicker(m,persistSettings); bindMedsManager(m); bindRemindersSettings(m);
   $("daystart").addEventListener("change",function(ev){ if(!ev.target.value) return; S.dayStart=ev.target.value; persistSettings(); todayKey=null; syncDays(); weekCache=null; render(); });
   $("erase").addEventListener("click",function(){ confirmErase=true; render(); var b=$("confirmbox"); if(b) b.scrollIntoView({block:"nearest"}); });
   if(confirmErase){
     $("erase-no").addEventListener("click",function(){ confirmErase=false; render(); });
     $("erase-yes").addEventListener("click",function(){ $("erase-yes").disabled=true; setSave("busy","Erasing…");
       Object.keys(subs).forEach(function(x){ try{subs[x]();}catch(e){} }); subs={}; days={}; todayKey=null;
-      store.erase().then(function(){ S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:myTz(),meds:[],medTimes:{},onTimeMin:30}; setupStep=1; confirmErase=false; tab="today"; setSave("ok",savedLabel()); syncDays(); render(); toast("Everything erased",null); },
+      store.erase().then(function(){ S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:myTz(),meds:[],medTimes:{},onTimeMin:30,rem:{}}; setupStep=1; confirmErase=false; tab="today"; setSave("ok",savedLabel()); syncDays(); render(); toast("Everything erased",null); },
         function(e){ onStoreError(e); confirmErase=false; syncDays(); render(); toast("Couldn't erase everything. Try again.",null); }); });
   }
 }
@@ -984,6 +996,90 @@ function runImport(imp){
 }
 
 /* ---------- render ---------- */
+/* ---------- reminders: stretch every N minutes, bedtime from a sleep goal; pop up on any tab ---------- */
+function R(){ var r=S.rem||{}; return {stretchOn:!!r.stretchOn,stretchEvery:r.stretchEvery||60,bedOn:!!r.bedOn,wake:r.wake||"07:00",goal:r.goal||8,bedMode:r.bedMode||"wake",sound:r.sound!==false}; }
+function remStore(){ try{ return JSON.parse(localStorage.getItem("habitrak3:rem")||"{}"); }catch(e){ return {}; } }
+function remSave(o){ try{ var now=Date.now(); Object.keys(o).forEach(function(k){ if(k!=="stretchLast"&&o[k]<now) delete o[k]; }); localStorage.setItem("habitrak3:rem",JSON.stringify(o)); }catch(e){} }
+function remQuiet(key){ return (remStore()[key]||0)>Date.now(); }
+function remHush(key,until){ var o=remStore(); o[key]=until; remSave(o); }
+/* When you woke today: the end of the latest sleep ending in today's window. */
+function wokeToday(){ var a=windowStart(todayKey)-2*3600000, w=null; liveEntries().forEach(function(e){ if(e.tr==="sleep"&&e.end!=null&&e.end>=a&&(!w||e.end>w)) w=e.end; }); return w; }
+function nextWake(){ var w=mapTime(todayKey,R().wake); if(w-windowStart(todayKey)<12*3600000) w+=DAY; return w; }
+function bedtimeTonight(){ var r=R(), g=r.goal*3600000;
+  if(r.bedMode==="awake"){ var w=wokeToday(); if(w) return {at:w+DAY-g,why:"after "+(24-r.goal)+" hours awake since you woke at "+fmt(w)}; }
+  var nw=nextWake(); return {at:nw-g,why:"to get "+r.goal+" hours before "+fmt(nw)}; }
+function stretchDueAt(){
+  var r=R(), run=running(); if(run&&run.tr==="stretch") return null;
+  var base=wokeToday()||windowStart(todayKey);
+  liveEntries().forEach(function(e){ if(e.tr==="stretch"){ var t=e.end==null?e.t:e.end; if(t>base) base=t; } });
+  var last=remStore().stretchLast||0; if(last>base) base=last;
+  var due=base+r.stretchEvery*60000, stop=r.bedOn? bedtimeTonight().at : windowStart(todayKey)+17*3600000;
+  return due<stop? due : null;
+}
+function remindersDue(){
+  var out=[], now=Date.now(), r=R(); if(!S||!S.setup||!todayKey) return out;
+  var run=running(), sleeping=run&&run.tr==="sleep";
+  if(tab!=="today"&&(S.meds||[]).length){ slotsFor(todayKey,liveEntries()).forEach(function(d){ if(d.status==="due"&&!snoozed(d)) out.push({id:"med:"+d.slot+":"+d.due,kind:"med",d:d}); }); }
+  if(r.bedOn&&!sleeping){ var b=bedtimeTonight(); if(now>=b.at&&now<b.at+5*3600000&&!remQuiet("bed:"+b.at)) out.push({id:"bed:"+b.at,kind:"bed",b:b}); }
+  if(r.stretchOn&&!sleeping){ var s=stretchDueAt(); if(s&&now>=s&&!remQuiet("stretch")) out.push({id:"stretch:"+s,kind:"stretch",at:s}); }
+  return out;
+}
+var lastRemId=null, audioCtx=null;
+document.addEventListener("pointerdown",function(){ try{ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==="suspended") audioCtx.resume(); }catch(e){} },{once:false,passive:true});
+function chime(){ if(!R().sound||!audioCtx) return; try{ var t=audioCtx.currentTime; [660,880].forEach(function(f,i){ var o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.frequency.value=f; g.gain.setValueAtTime(0.0001,t+i*0.25); g.gain.exponentialRampToValueAtTime(0.2,t+i*0.25+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+i*0.25+0.4); o.connect(g); g.connect(audioCtx.destination); o.start(t+i*0.25); o.stop(t+i*0.25+0.45); }); }catch(e){} }
+function renderReminders(){
+  var box=$("remind"), due=remindersDue();
+  if(!due.length){ box.hidden=true; box.innerHTML=""; lastRemId=null; return; }
+  var it=due[0], h='', more=due.length>1? '<p class="remmore">'+(due.length-1)+' more after this</p>' : '';
+  if(it.kind==="stretch"){ var since=Date.now()-it.at+R().stretchEvery*60000;
+    h='<p class="remtitle">Time to stretch</p><p>It\'s been '+dur(since)+' since you last stretched or woke up.</p><div class="row"><button type="button" class="pill big" data-rem="stretched">I stretched</button><button type="button" class="pill tonal" data-rem="startstretch">Start a stretch</button><button type="button" class="pill tonal" data-rem="stretchlater">In 15 min</button><button type="button" class="pill tonal" data-rem="stretchskip">Skip this one</button></div>'; }
+  else if(it.kind==="bed"){
+    h='<p class="remtitle">Time to get ready for bed</p><p>Sleep by '+fmt(it.b.at)+' '+esc(it.b.why)+'.</p><div class="row"><button type="button" class="pill big" data-rem="bed">Going to bed</button><button type="button" class="pill tonal" data-rem="bedlater">In 15 min</button><button type="button" class="pill tonal" data-rem="bedno">Not tonight</button></div>'; }
+  else { var d=it.d;
+    h='<p class="remtitle">Time for your '+d.name.toLowerCase()+' pills</p><p>'+d.pills+' pill'+(d.pills===1?'':'s')+', due at '+fmt(d.due)+'.</p><div class="row"><button type="button" class="pill big" data-rem="medtook">I took them</button><button type="button" class="pill tonal" data-rem="medlater">In 30 min</button><button type="button" class="pill tonal" data-rem="medopen">Open Today</button></div>'; }
+  box.innerHTML='<div class="remcard">'+h+more+'</div>'; box.hidden=false;
+  if(it.id!==lastRemId){ lastRemId=it.id; chime(); }
+  box.querySelectorAll("[data-rem]").forEach(function(b){ b.addEventListener("click",function(){
+    var a=b.dataset.rem, now=Date.now(), o;
+    if(a==="stretched"){ var e={id:newId(),tr:"stretch",t:now-5*60000,end:now}; addEntry(e); toast("Stretch logged · 5 min",function(){ removeEntry(find(e.id)||e); }); }
+    else if(a==="startstretch"){ tap("stretch"); }
+    else if(a==="stretchlater"){ remHush("stretch",now+15*60000); }
+    else if(a==="stretchskip"){ o=remStore(); o.stretchLast=now; remSave(o); toast("Next stretch reminder in "+dur(R().stretchEvery*60000),null); }
+    else if(a==="bed"){ var r=running(); if(!r||r.tr!=="sleep") tap("sleep"); }
+    else if(a==="bedlater"){ remHush("bed:"+it.b.at,now+15*60000); }
+    else if(a==="bedno"){ remHush("bed:"+it.b.at,it.b.at+5*3600000); }
+    else if(a==="medtook"){ logSlot(it.d,now,false); }
+    else if(a==="medlater"){ snooze(it.d,30); }
+    else if(a==="medopen"){ tab="today"; dayView=null; window.scrollTo(0,0); }
+    render(); }); });
+}
+function remindersHTML(){
+  var r=R(), b=S.setup&&todayKey? bedtimeTonight() : null;
+  function chip(attr,val,on,txt){ return '<button type="button" class="chip" style="--c:var(--brand)" '+attr+'="'+val+'" aria-pressed="'+on+'">'+txt+'</button>'; }
+  var h='<p class="lbl2">Reminders</p><div class="card">';
+  h+='<div class="field"><span><b>Stretch</b><small>A reminder to stretch, counted from when you woke up or last stretched.</small></span>'+chip("data-rset","stretchOn",r.stretchOn,r.stretchOn?"On":"Off")+'</div>';
+  if(r.stretchOn) h+='<div class="chips" role="group" aria-label="How often" style="margin:4px 0 6px">'+[30,45,60,90,120].map(function(v){ return chip("data-revery",v,r.stretchEvery===v,"Every "+(v<60?v+" min":(v/60)+(v===60?" hour":" hours"))); }).join("")+'</div>';
+  h+='<div class="field"><span><b>Bedtime</b><small>A reminder to go to bed, worked out from your sleep goal.</small></span>'+chip("data-rset","bedOn",r.bedOn,r.bedOn?"On":"Off")+'</div>';
+  if(r.bedOn){
+    h+='<div class="field"><span>Sleep goal</span><span class="step"><span><b>'+r.goal+' hours</b></span><div><button type="button" data-rgoal="-0.5" aria-label="Half an hour less">−</button><button type="button" data-rgoal="0.5" aria-label="Half an hour more">+</button></div></span></div>';
+    h+='<p class="sub" style="margin:6px 0 6px">Plan bedtime from</p><div class="chips" style="margin-bottom:6px">'+chip("data-rmode","wake",r.bedMode==="wake","When I want to wake up")+chip("data-rmode","awake",r.bedMode==="awake","When I woke up today")+'</div>';
+    if(r.bedMode==="wake") h+='<div class="addtimes"><label>Wake up at<input type="time" id="rem-wake" value="'+esc(r.wake)+'"></label></div>';
+    if(b) h+='<p class="sub" style="margin:4px 0 0"><b style="color:var(--ink)">Tonight: bed by '+fmt(b.at)+'</b>, '+esc(b.why)+'.</p>';
+  }
+  h+='<div class="field"><span><b>Sound</b><small>A short chime when a reminder pops up.</small></span>'+chip("data-rset","sound",r.sound,r.sound?"On":"Off")+'</div>';
+  h+='<p class="sub" style="margin:8px 0 0">Reminders pop up on any screen while Habitrak is open. Alerts on a locked phone come with the Android app.</p></div>';
+  return h;
+}
+function bindRemindersSettings(m){
+  function set(k,v){ S.rem=S.rem||{}; S.rem[k]=v; persistSettings(); render(); }
+  m.querySelectorAll("[data-rset]").forEach(function(b){ b.addEventListener("click",function(){ var k=b.dataset.rset, cur=R()[k]; set(k,!cur); if(k==="stretchOn"&&!cur){ var o=remStore(); o.stretchLast=Date.now(); remSave(o); } }); });
+  m.querySelectorAll("[data-revery]").forEach(function(b){ b.addEventListener("click",function(){ set("stretchEvery",+b.dataset.revery); }); });
+  m.querySelectorAll("[data-rgoal]").forEach(function(b){ b.addEventListener("click",function(){ set("goal",Math.max(5,Math.min(11,R().goal+(+b.dataset.rgoal)))); }); });
+  m.querySelectorAll("[data-rmode]").forEach(function(b){ b.addEventListener("click",function(){ set("bedMode",b.dataset.rmode); }); });
+  var w=$("rem-wake"); if(w) w.addEventListener("change",function(){ if(w.value) set("wake",w.value); });
+}
+function bedtimeLine(){ var r=R(), out=[], s=r.stretchOn? stretchDueAt() : null; if(r.bedOn) out.push("Bedtime tonight: "+fmt(bedtimeTonight().at)); if(s&&s>Date.now()) out.push("Next stretch: "+fmt(s)); return out.length? '<p class="next">'+out.join(" · ")+'</p>' : ""; }
+
 function render(){
   if(!S||!store) return;
   var m=$("main"), setup=!S.setup;
@@ -992,12 +1088,13 @@ function render(){
   if(!todayKey) syncDays();
   renderNav();
   ({today:renderToday,week:renderWeek,trends:renderTrends,goals:renderGoals,trackers:renderTrackers}[tab]||renderToday)(m);
+  renderReminders();
 }
 setInterval(function(){
   if(!S||!store||!S.setup) return;
   var rolled=syncDays();
   var a=document.activeElement, typing=a&&(a.tagName==="INPUT");
-  if((tab==="today"&&editing==null&&!addOpen&&!typing)||rolled) render();
+  if((tab==="today"&&editing==null&&!addOpen&&!typing)||rolled) render(); else renderReminders();
 },30000);
 
 /* ---------- boot ---------- */
@@ -1005,7 +1102,7 @@ function boot(st){
   store=st; setSave("ok",savedLabel());
   Promise.all([store.loadSettings(), store.getImport().catch(function(){return null;})]).then(function(r){
     var o=r[0], imp=r[1];
-    if(o&&o.sel) S={sel:o.sel.filter(function(t){return CAT[t];}).slice(0,MAX),goals:o.goals||{},dayStart:o.dayStart||"05:00",setup:!!o.setup,tz:o.tz||"",meds:migrateMeds(Array.isArray(o.meds)?o.meds:[]),medTimes:o.medTimes||{},onTimeMin:o.onTimeMin||30};
+    if(o&&o.sel) S={sel:o.sel.filter(function(t){return CAT[t];}).slice(0,MAX),goals:o.goals||{},dayStart:o.dayStart||"05:00",setup:!!o.setup,tz:o.tz||"",meds:migrateMeds(Array.isArray(o.meds)?o.meds:[]),medTimes:o.medTimes||{},onTimeMin:o.onTimeMin||30,rem:o.rem||{}};
     else if(imp&&!imp.done) S={sel:(imp.sel||FIRST_RUN).filter(function(t){return CAT[t];}).slice(0,MAX),goals:imp.goals||{},dayStart:imp.dayStart||"05:00",setup:false,tz:""};
     else S={sel:FIRST_RUN.slice(),goals:{},dayStart:"05:00",setup:false,tz:""};
     if(!S.sel.length) S.sel=FIRST_RUN.slice();
